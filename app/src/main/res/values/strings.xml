@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">BulletinBoard</string>
+
+    <!-- Menu Drawer Strings -->
+    <string name="ad_cat1">Объявления</string>
+    <string name="ad_my_ads">Мои объявления</string>
+    <string name="my_fav">Избранные</string>
+    <string name="def">Разное</string>
+    <string name="ad_car">Машины</string>
+    <string name="ad_pc">Компьютеры</string>
+    <string name="ad_smartphone">Смартфоны</string>
+    <string name="ad_dm">Бытовая техника</string>
+    <string name="ad_cat2">Аккаунт</string>
+    <string name="ac_sign_up">Регистрация</string>
+    <string name="ac_sign_in">Вход</string>
+    <string name="ac_sign_out">Выход</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="not_reg">Войдите или зарегестрируйтесь!</string>
+    <string name="remove_ads">Удалить рекламу</string>
+
+    <!-- Sign Dialog -->
+    <string name="email_reset_password_was_sent">Reset Email was sent!</string>
+    <string name="dialog_reset_email_message">Для востановления пароля укажите ваш Email адресс!</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_up_action">Зарегистрироваться</string>
+    <string name="sign_in_action">Войти</string>
+    <string name="forget_password">Забыли пароль?</string>
+    <string name="sign_up_error">Неудалось зарегестрироваться</string>
+    <string name="sign_in_error">Неудалось войти</string>
+    <string name="send_verification_error">Неудалось отправить email для потверждения!</string>
+    <string name="send_verification_done">На вашу почту была отправленна ссылка для подверждения
+        вашего аккаунта, пожалуйста подтвердите ваш аккаунт!</string>
+    <!-- Sign Dialog -->
+    <string name="link_done">Email успешно подключен к Google аккаунту</string>
+    <string name="enter_to_g">У вас уже есть аккаунт с этим Email адресом войдите по нему.</string>sign_in_action
+</resources>
