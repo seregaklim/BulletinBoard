@@ -34,5 +34,31 @@
         вашего аккаунта, пожалуйста подтвердите ваш аккаунт!</string>
     <!-- Sign Dialog -->
     <string name="link_done">Email успешно подключен к Google аккаунту</string>
-    <string name="enter_to_g">У вас уже есть аккаунт с этим Email адресом войдите по нему.</string>sign_in_action
+    <string name="enter_to_g">У вас уже есть аккаунт с этим Email адресом войдите по нему.</string>
+    sign_in_action
+    <string name="sign_in_entered">Вы удачно вошли</string>
+    <!-- Edit Activity -->
+    <string name="select_country">*Выберите страну</string>
+    <string name="select_city">*Выберите город</string>
+    <string name="country">Страна</string>
+    <string name="city">Город</string>
+    <string name="index">*Индекс</string>
+    <string name="tel">Телефон</string>
+    <string name="tel_number">*Номер телефона</string>
+    <string name="category">Категория</string>
+    <string name="title">Заголовок</string>
+    <string name="title_hint">* Название объявления</string>
+    <string name="select_category">*Выберите категорию</string>
+    <string name="price">Цена</string>
+    <string name="price_hint">*Укажите цену</string>
+    <string name="description">Описание</string>
+    <string name="description_hint">*Описание</string>
+    <string name="with_send">С отправкой</string>
+    <string name="send">Отправка</string>
+    <string name="publish">Опубликовать</string>
+    <!-- Ad List Item -->
+    <string name="price_desc">Цена:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
