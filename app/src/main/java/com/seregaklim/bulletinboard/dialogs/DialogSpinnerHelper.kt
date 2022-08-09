@@ -27,6 +27,7 @@ class DialogSpinnerHelper {
         dialog.show()
     }
 
+
     private fun setSearchView(
         adapter: RcViewDialogSpinnerAdapter,
         list: ArrayList<String>,
