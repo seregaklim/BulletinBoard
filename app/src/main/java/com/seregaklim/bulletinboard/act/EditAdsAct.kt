@@ -1,5 +1,6 @@
 package com.seregaklim.bulletinboard.act
 
+
 import android.R
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -60,21 +61,23 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
             PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS->{
                 if(grantResults.isNotEmpty() && grantResults [0]== PackageManager.PERMISSION_GRANTED){
                    // isImagesPermissionGranted =true
+
              //количество фотографий
                imagePicker.getImages(this,3)
                 } else {
                  //   isImagesPermissionGranted =false
                     Toast.makeText(this,"Включите, разрешение!!",Toast.LENGTH_LONG).show()
-                }
+
+
                 return
             }
 
         }
     }
+}
 
 
-
-    private fun init(){
+    fun init(){
 
 //val listCountry=CityHelper.getAllCountries(this)
 //
@@ -101,6 +104,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         }
     }
 
+
 //    //запускаем картинку
 //    fun onClickGetImages(view: View){
 //          imagePicker.getImages(this)
@@ -119,6 +123,8 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     override fun onFragClose() {
        binding.scroolViewMain.visibility=View.VISIBLE
     }
+
+
 
 
 }

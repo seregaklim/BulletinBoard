@@ -11,6 +11,8 @@ class ImagePicker {
         val options = Options.init()
             .setRequestCode(REQUEST_CODE_GET_IMAGES)
             .setCount(imageCounter) //количество фотографий
+            .setCount(3)
+
             .setFrontfacing(false)
             .setMode(Options.Mode.Picture)
             .setScreenOrientation(Options.SCREEN_ORIENTATION_REVERSE_PORTRAIT)
