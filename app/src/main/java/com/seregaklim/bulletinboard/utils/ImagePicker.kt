@@ -2,8 +2,10 @@ package com.seregaklim.bulletinboard.utils
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
+
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
+import com.seregaklim.bulletinboard.act.EditAdsAct
 
 class ImagePicker {
     val REQUEST_CODE_GET_IMAGES=999
