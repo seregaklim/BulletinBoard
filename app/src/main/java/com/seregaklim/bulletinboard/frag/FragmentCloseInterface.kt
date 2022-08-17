@@ -4,5 +4,5 @@ import android.graphics.Bitmap
 
 //закрывыет фрагмент
 interface FragmentCloseInterface {
-    fun onFragClose(list:ArrayList<SelectImageItem>)
+    fun onFragClose(list:ArrayList<Bitmap>)
 }
