@@ -45,9 +45,8 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
 
     }
     //запрос на обработку картинок
-    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+      //  super.onActivityResult(requestCode, resultCode, data)
 
         //функция, позволяющая взять картинки и сделать фото
         imagePicker.showSelectegImages(resultCode,requestCode,data,this)

@@ -7,27 +7,26 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.seregaklim.bulletinboard.R
 import com.seregaklim.bulletinboard.act.EditAdsAct
+import com.seregaklim.bulletinboard.databinding.SelectImageFragItemBinding
+import com.seregaklim.bulletinboard.utils.AdapterCallback
+import com.seregaklim.bulletinboard.utils.ImageManager
 import com.seregaklim.bulletinboard.utils.ImagePicker
 import com.seregaklim.bulletinboard.utils.ItemTouchMoveCallback
 
 
-class SelectImageRvAdapter() : RecyclerView.Adapter<SelectImageRvAdapter.ImageHolder>(),ItemTouchMoveCallback.ItemTouchAdapter {
+class SelectImageRvAdapter(val adapterCallback :AdapterCallback) : RecyclerView.Adapter<SelectImageRvAdapter.ImageHolder>(),ItemTouchMoveCallback.ItemTouchAdapter {
 
     val mainArray=ArrayList<Bitmap>()
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
 
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.select_image_frag_item,parent,false)
-        return ImageHolder(view,parent.context,this)
+        val viewBinding =SelectImageFragItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+
+        return ImageHolder(viewBinding,parent.context,this)
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
@@ -55,22 +54,15 @@ class SelectImageRvAdapter() : RecyclerView.Adapter<SelectImageRvAdapter.ImageHo
     }
 
 
-    class ImageHolder(itemView:View, val context:Context,val adapter :SelectImageRvAdapter):RecyclerView.ViewHolder(itemView){
-        val imagePicker = ImagePicker()
-        lateinit var tvTitle:TextView
-        lateinit var image :ImageView
-        lateinit var imEditImage :ImageButton
-        lateinit var imDeletImage :ImageButton
-
+    class ImageHolder(private val viewBinding: SelectImageFragItemBinding, val context:Context,val adapter :SelectImageRvAdapter):RecyclerView.ViewHolder(viewBinding.root){
 
         fun setData(bitmap: Bitmap){
-            tvTitle=itemView.findViewById(R.id.tvTitle)
-            image=itemView.findViewById(R.id.imageView)
-            imEditImage=itemView.findViewById(R.id.imEditImage)
-            imDeletImage=itemView.findViewById(R.id.imDelete)
+            val imagePicker= ImagePicker()
+            val imageManager = ImageManager
+
 
             //редактируем отдельную фотографию
-            imEditImage.setOnClickListener {
+            viewBinding.  imEditImage.setOnClickListener {
 
                 imagePicker.getImages(context as EditAdsAct,1,imagePicker.REQUEST_CODE_GET_SINGLE_IMAGE)
                 //на позицию , которую нажали
@@ -79,23 +71,24 @@ class SelectImageRvAdapter() : RecyclerView.Adapter<SelectImageRvAdapter.ImageHo
             }
 
             //удаляем выбранную картинку
-            imDeletImage.setOnClickListener {
+            viewBinding.imDelete.setOnClickListener {
 
                 adapter.mainArray.removeAt(adapterPosition)
                 //обновляем адаптер
                 adapter.notifyItemRemoved(adapterPosition)
                 //происходит плавное удаление с анимацией
                 for (n in 0 until adapter.mainArray.size)adapter.notifyItemChanged(n)
+
+                adapter.adapterCallback.onItemDelete()
             }
-
-
-
-            tvTitle.text=context.resources.getStringArray(R.array.title_array)[adapterPosition]
-            image.setImageBitmap(bitmap)
+            viewBinding. tvTitle.text=context.resources.getStringArray(R.array.title_array)[adapterPosition]
+            //проверяем вертикальная картинка или горизонтальная и обрезаем
+            imageManager.chooseScaleType(viewBinding.imageView,bitmap)
+            viewBinding.imageView.setImageBitmap(bitmap)
 
         }
-
     }
+
     fun updateAdapter(newlist:List<Bitmap>, needClear : Boolean){
         //очищаем данные
         if(needClear) mainArray.clear()
@@ -104,6 +97,4 @@ class SelectImageRvAdapter() : RecyclerView.Adapter<SelectImageRvAdapter.ImageHo
         //сооющаем адаптеру об изменении
         notifyDataSetChanged()
     }
-
-
 }

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 
 import android.net.Uri
 import android.util.Log
+import android.widget.ImageView
 import androidx.exifinterface.media.ExifInterface
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +50,18 @@ object ImageManager {
 
         return rotaition
     }
+
+    //позволяет узнавать, картинка горизонтальная или вертикалиная, после чего картинка расширяется
+    fun chooseScaleType(im: ImageView, bitMap: Bitmap){
+        //горизонтальная
+        if(bitMap.width > bitMap.height){
+             //обрезаем
+            im.scaleType = ImageView.ScaleType.CENTER_CROP
+        } else {
+            im.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        }
+    }
+
     //функция сжатия  ( withContext(Dispatchers.IO)-запускается в фоновом режиме))
   suspend  fun imageResize (uris:List<String>):List<Bitmap> = withContext(Dispatchers.IO){
         //массив с высотой и шириной
