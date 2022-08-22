@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1017894368091",
+    "firebase_url": "https://bulletinboard-db186-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "bulletinboard-db186",
     "storage_bucket": "bulletinboard-db186.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1017894368091-knifr1dr0cf7edqhudo3j3skicame5g5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.seregaklim.bulletinboard",
+            "certificate_hash": "7aa0ab6e69d5ffb80307d0467a9e3fa1b8d06bfc"
+          }
+        },
         {
           "client_id": "1017894368091-490bhumb4ti341k2n8hhvngv731b8u47.apps.googleusercontent.com",
           "client_type": 3

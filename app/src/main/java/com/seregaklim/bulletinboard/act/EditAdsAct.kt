@@ -15,6 +15,7 @@ import com.fxn.pix.Pix
 
 import com.fxn.utility.PermUtil
 import com.seregaklim.bulletinboard.adapters.ImageAdapter
+import com.seregaklim.bulletinboard.database.DbManager
 import com.seregaklim.bulletinboard.databinding.ActivityEditAdsBinding
 
 import com.seregaklim.bulletinboard.dialogs.DialogSpinnerHelper
@@ -139,6 +140,16 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         //чтобы эти изминения применились
         fm.commit()
     }
+
+
+
+    fun onClickPublish(view: View){
+
+   val dbManager =DbManager()
+        dbManager.publishAd()
+    }
+
+
 
 
     //запускаем картинку

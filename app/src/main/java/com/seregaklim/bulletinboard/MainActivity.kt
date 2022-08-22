@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -19,8 +20,10 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.seregaklim.bulletinboard.act.EditAdsAct
+import com.seregaklim.bulletinboard.database.DbManager
 import com.seregaklim.bulletinboard.databinding.ActivityMainBinding
 import com.seregaklim.bulletinboard.dialoghelper.DialogConst
 import com.seregaklim.bulletinboard.dialoghelper.DialogHelper
@@ -93,6 +96,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.id_remove_ads -> {
+
 
             }
             //регистр
