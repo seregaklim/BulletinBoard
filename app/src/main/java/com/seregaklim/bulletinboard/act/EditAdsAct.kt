@@ -15,6 +15,7 @@ import com.fxn.pix.Pix
 
 import com.fxn.utility.PermUtil
 import com.seregaklim.bulletinboard.adapters.ImageAdapter
+import com.seregaklim.bulletinboard.data.Ad
 import com.seregaklim.bulletinboard.database.DbManager
 import com.seregaklim.bulletinboard.databinding.ActivityEditAdsBinding
 
@@ -36,7 +37,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     //переменная картики, которой хлтим изменить
     var editImagePos = 0
 
-
+   private val dbManager =DbManager(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +89,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     }
 
     //OnClicks
-    //  ищем страну в DialogSpinnerHelper
+    // кнопка -выбираем страну в DialogSpinnerHelper
     fun onClickSelectCountry(view: View){
         val listCountry = CityHelper.getAllCountries(this)
         dialog.showSpinnerDialog(this, listCountry, binding.tvCountry)
@@ -96,7 +97,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
             binding.tvCity.text = getString(com.seregaklim.bulletinboard.R.string.select_city)
         }
     }
-    //ищем город в DialogSpinnerHelper
+    // кнопка -выбираем город в DialogSpinnerHelper
     fun onClickSelectCity(view: View){
         val selectedCountry = binding.tvCountry.text.toString()
         if(selectedCountry != getString(com.seregaklim.bulletinboard.R.string.select_country)){
@@ -106,6 +107,12 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
             Toast.makeText(this, "No country selected", Toast.LENGTH_LONG).show()
         }
     }
+    // кнопка -выбираем категорию объявления
+    fun onClickSelectCat(view: View){
+        val listCity = resources.getStringArray(com.seregaklim.bulletinboard.R.array.category).toMutableList() as ArrayList
+        dialog.showSpinnerDialog(this, listCity, binding.tvCat)
+    }
+
 
 
     //запускаем картинку
@@ -141,12 +148,30 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         fm.commit()
     }
 
+    //возвращаем заполненноее объявление
+    private fun fillAd():Ad {
+        val ad: Ad
+        binding.apply {
+            ad = Ad(tvCountry.text.toString(),
+                tvCity.text.toString(),
+                editTel.text.toString(),
+                edIndex.text.toString(),
+                checkBoxWithSend.isChecked.toString(),
+                tvCat.text.toString(),
+                edTitle.text.toString(),
+                edPrice.text.toString(),
+                edDescription.text.toString(),
+                //генерируем уникальный ключ
+                dbManager.db.push().key
+            )
+        }
+      return ad
+    }
 
-
+//публикуем
     fun onClickPublish(view: View){
 
-   val dbManager =DbManager()
-        dbManager.publishAd()
+        dbManager.publishAd(fillAd())
     }
 
 

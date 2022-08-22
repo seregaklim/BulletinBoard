@@ -12,18 +12,6 @@ data class Ad(
     val title: String? = null,
     val price: String? = null,
     val description: String? = null,
-//    val email: String? = null,
-//    val mainImage: String = "empty",
-//    val image2: String = "empty",
-//    val image3: String = "empty",
-//    val key: String? = null,
-//    var favCounter: String = "0",
-//    val uid: String? = null,
-//    val time: String = "0",
-//
-//    var isFav: Boolean = false,
-//
-//    var viewsCounter: String = "0",
-//    var emailCounter: String = "0",
-//    var callsCounter: String = "0"
+    //генерируем ключ
+    val key: String? = null,
 )

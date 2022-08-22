@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
@@ -23,20 +24,25 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.seregaklim.bulletinboard.act.EditAdsAct
+import com.seregaklim.bulletinboard.adapters.AdsRcAdapter
+import com.seregaklim.bulletinboard.data.Ad
 import com.seregaklim.bulletinboard.database.DbManager
+import com.seregaklim.bulletinboard.database.ReadDataCallbsck
 import com.seregaklim.bulletinboard.databinding.ActivityMainBinding
 import com.seregaklim.bulletinboard.dialoghelper.DialogConst
 import com.seregaklim.bulletinboard.dialoghelper.DialogHelper
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+    ReadDataCallbsck {
 
     lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
     private lateinit var tvAccount: TextView
     private lateinit var binding: ActivityMainBinding
     private val dialogHelper = DialogHelper(this)
     val mAuth = FirebaseAuth.getInstance()
-    // val mAuth = Firebase.auth
+     val dbManager =DbManager(this)
+    val adapter = AdsRcAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +51,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(view)
 
         init()
+        initRecyclerView()
+        dbManager.readDataFromDb()
     }
 
     private fun init (){
@@ -59,6 +67,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //инициализируем Header ,показываем Email (индекс 0,т.к он один)
         tvAccount = binding.navView.getHeaderView(0).findViewById(R.id.tvAccountEmail)
     }
+    private fun initRecyclerView(){
+        binding.apply {
+            mainContent.rcView.layoutManager =LinearLayoutManager(this@MainActivity)
+            mainContent.rcView.adapter =adapter
+        }
+
+    }
+
+
     //включаем менюшку в бар
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -68,9 +85,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(item.itemId == R.id.id_new_ads){
             val i = Intent(this@MainActivity, EditAdsAct::class.java)
-                //запуск активити
+            //запуск активити
             startActivity(i)
-            }
+        }
         return super.onOptionsItemSelected(item)
     }
 
@@ -149,6 +166,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
+    }
+    //передаем список с сервера
+    override fun readData(list: List<Ad>) {
+       adapter.updateAdapter(list)
     }
 
 
