@@ -1,15 +1,15 @@
-package com.seregaklim.bulletinboard.database
+package com.seregaklim.bulletinboard.model
 
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.seregaklim.bulletinboard.data.Ad
 
 
-class DbManager (val readDataCallbsck: ReadDataCallbsck?) {
+class DbManager {
 
   val db = Firebase.database.getReference("main")
   val auth = Firebase.auth
@@ -27,10 +27,27 @@ class DbManager (val readDataCallbsck: ReadDataCallbsck?) {
 
   }
 
-  //достаем данные с сервера
-  fun readDataFromDb(){
+  //достаем объявления все подряд
+  fun getAllAds(readDataCallback: ReadDataCallback?){
+    //фильтруем  "/ad/uid" равен моему индмфикатуру аккаунта auth.uid
+    val query = db.orderByChild(auth.uid  + "/ad/price")
+    //выдает все объявления с индификатором
+    readDataFromDb(query, readDataCallback)
+  }
+
+
+  ///достаем объявления по моему индификатору
+  fun getMyAds(readDataCallback: ReadDataCallback?){
+       //фильтруем  "/ad/uid" равен моему индмфикатуру аккаунта auth.uid
+    val query = db.orderByChild(auth.uid  + "/ad/uid").equalTo(auth.uid)
+    //выдает все объявления с индификатором
+    readDataFromDb(query, readDataCallback)
+  }
+
+  //достаем данные с сервера (query: Query -специальный класс умеющий фильтровать)
+private  fun readDataFromDb(query: Query, readDataCallbsck: ReadDataCallback?){
     //загружает один раз
-    db.addListenerForSingleValueEvent(object : ValueEventListener{
+    query.addListenerForSingleValueEvent(object : ValueEventListener{
 
       override fun onDataChange(snapshot: DataSnapshot) {
         val adArray=ArrayList<Ad>()
@@ -55,4 +72,7 @@ class DbManager (val readDataCallbsck: ReadDataCallbsck?) {
 
   }
 
+  interface ReadDataCallback {
+    fun readData(list: ArrayList<Ad>)
+  }
 }

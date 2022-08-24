@@ -1,6 +1,4 @@
-package com.seregaklim.bulletinboard.data
-
-import java.io.Serializable
+package com.seregaklim.bulletinboard.model
 
 data class Ad(
     val country: String? = null,
@@ -14,4 +12,6 @@ data class Ad(
     val description: String? = null,
     //генерируем ключ
     val key: String? = null,
-)
+    // юзер индификатор
+    val uid: String? = null,
+    )

@@ -2,23 +2,15 @@ package com.seregaklim.bulletinboard.frag
 
 import android.app.Activity
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ProgressBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.seregaklim.bulletinboard.R
 import com.seregaklim.bulletinboard.act.EditAdsAct
-import com.seregaklim.bulletinboard.databinding.ListImageFragBinding
 import com.seregaklim.bulletinboard.dialogs.ProgressDialog
 import com.seregaklim.bulletinboard.utils.AdapterCallback
 import com.seregaklim.bulletinboard.utils.ImageManager
@@ -130,11 +122,8 @@ AdapterCallback{
             addImageItem?.setOnMenuItemClickListener {
                 //количество возмжных добавляемых картинок
                 val imageCount = imagePicker.MAX_IMAGE_COUNT - adapter.mainArray.size
-                imagePicker.getImages(
-                    activity as AppCompatActivity,
-                    imageCount,
-                    imagePicker.REQUEST_CODE_GET_IMAGES
-                )
+                imagePicker.launcher(activity as EditAdsAct,(activity as EditAdsAct).launcherMultiSelectImages,imageCount)
+
                 true
             }
         }

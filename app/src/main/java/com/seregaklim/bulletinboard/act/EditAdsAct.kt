@@ -1,29 +1,26 @@
 package com.seregaklim.bulletinboard.act
 
 
-import android.R
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 
 import android.widget.Toast
-import com.fxn.pix.Pix
+import androidx.activity.result.ActivityResultLauncher
 
 import com.fxn.utility.PermUtil
 import com.seregaklim.bulletinboard.adapters.ImageAdapter
-import com.seregaklim.bulletinboard.data.Ad
-import com.seregaklim.bulletinboard.database.DbManager
+import com.seregaklim.bulletinboard.model.Ad
+import com.seregaklim.bulletinboard.model.DbManager
 import com.seregaklim.bulletinboard.databinding.ActivityEditAdsBinding
 
 import com.seregaklim.bulletinboard.dialogs.DialogSpinnerHelper
 import com.seregaklim.bulletinboard.frag.FragmentCloseInterface
 import com.seregaklim.bulletinboard.frag.ImageListFrag
 import com.seregaklim.bulletinboard.utils.CityHelper
-import com.seregaklim.bulletinboard.utils.ImageManager
 import com.seregaklim.bulletinboard.utils.ImagePicker
 
 
@@ -37,7 +34,10 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     //переменная картики, которой хлтим изменить
     var editImagePos = 0
 
-   private val dbManager =DbManager(null)
+    var launcherMultiSelectImages : ActivityResultLauncher<Intent>? =null
+    var launcherSingleSelectImage : ActivityResultLauncher<Intent>? =null
+    private val dbManager = DbManager()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +46,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         init()
 
     }
-    //запрос на обработку картинок
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-      //  super.onActivityResult(requestCode, resultCode, data)
 
-        //функция, позволяющая взять картинки и сделать фото
-        imagePicker.showSelectegImages(resultCode,requestCode,data,this)
-
-    }
 
     //запрашиваем разрешение досиупа к фотографиям
     override fun onRequestPermissionsResult(
@@ -61,15 +54,15 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        //   super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+
         when(requestCode){
             PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS->{
                 if(grantResults.isNotEmpty() && grantResults [0]== PackageManager.PERMISSION_GRANTED){
                     // isImagesPermissionGranted =true
 
                     //количество фотографий
-                    imagePicker.getImages(this,3,imagePicker.REQUEST_CODE_GET_IMAGES)
+                    imagePicker.launcher(this,launcherMultiSelectImages,3)
                 } else {
                     //   isImagesPermissionGranted =false
                     Toast.makeText(this,"Включите, разрешение!!",Toast.LENGTH_LONG).show()
@@ -80,12 +73,16 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
 
             }
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
 
     fun init(){
         imageAdapter = ImageAdapter()
         binding.vpImages.adapter = imageAdapter
+        launcherMultiSelectImages = imagePicker.getLaunherForMultiSelectImages(this)
+        launcherSingleSelectImage = imagePicker.getLauncherForSingleImage(this)
+
     }
 
     //OnClicks
@@ -119,7 +116,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     fun onClickGetImages(view: View){
         //если нет фото
         if(imageAdapter.mainArray.size == 0){
-            imagePicker.getImages(this, 3,imagePicker.REQUEST_CODE_GET_IMAGES)
+            imagePicker.launcher(this, launcherMultiSelectImages, 3 )
 //       если есть
         } else {
             openChooseImageFrag(null)
@@ -162,7 +159,9 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
                 edPrice.text.toString(),
                 edDescription.text.toString(),
                 //генерируем уникальный ключ
-                dbManager.db.push().key
+                dbManager.db.push().key,
+                // юзер индификатор
+                dbManager.auth.uid
             )
         }
       return ad

@@ -61,14 +61,14 @@ class SelectImageRvAdapter(val adapterCallback :AdapterCallback) : RecyclerView.
             val imageManager = ImageManager
 
 
-            //редактируем отдельную фотографию
-            viewBinding.  imEditImage.setOnClickListener {
+//            //редактируем отдельную фотографию
+           viewBinding.  imEditImage.setOnClickListener {
 
-                imagePicker.getImages(context as EditAdsAct,1,imagePicker.REQUEST_CODE_GET_SINGLE_IMAGE)
-                //на позицию , которую нажали
-                context.editImagePos=adapterPosition
+               imagePicker.launcher(context as EditAdsAct,context.launcherSingleSelectImage, imageCounter = 1)
 
-            }
+               //на позицию , которую нажали
+               context.editImagePos=adapterPosition
+           }
 
             //удаляем выбранную картинку
             viewBinding.imDelete.setOnClickListener {
