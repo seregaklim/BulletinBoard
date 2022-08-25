@@ -17,5 +17,11 @@ data class Ad(
     // юзер индификатор
     val uid: String? = null,
 
+    //*****счетчики********
+    var viewsCounter: String = "0",
+    var emailCounter: String = "0",
+    var callsCounter: String = "0"
+    //*********************
+
     // класс Serializable превращает в байты (для передачи Intenta)
     ):Serializable

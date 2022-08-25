@@ -48,16 +48,22 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
             tvDescription.text = ad.description
             tvPrice.text = ad.price
             tvTitle.text=ad.title
+            tvViewCounter.text=ad.viewsCounter
 
             showEditPanel(isOwner(ad))
 
             //редактируем
             ibEditAd.setOnClickListener(onClickEdit(ad))
+
             //удаляем
             ibDeleteAd.setOnClickListener{
             act.onDeleteItem(ad)
             }
 
+            //счетчик просмотров
+            itemView.setOnClickListener {
+                act.onAdViewed(ad)
+            }
         }
 
         //редактируем
@@ -95,7 +101,7 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
 
     interface Listener{
         fun onDeleteItem(ad: Ad)
-//        fun onAdViewed(ad: Ad)
+        fun onAdViewed(ad: Ad)
 //        fun onFavClicked(ad: Ad)
     }
 }

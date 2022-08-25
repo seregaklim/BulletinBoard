@@ -13,8 +13,18 @@ import com.google.firebase.ktx.Firebase
 
 class DbManager {
 
-  val db = Firebase.database.getReference("main")
+  val db = Firebase.database.getReference(MAIN_NODE)
   val auth = Firebase.auth
+
+  companion object{
+    const val AD_NODE = "ad"
+    const val FILTER_NODE = "adFilter"
+    const val INFO_NODE = "info"
+    const val MAIN_NODE = "main"
+    const val FAVS_NODE = "favs"
+    const val ADS_LIMIT = 2
+  }
+
 
   //отправляем на сервер
   fun publishAd(ad: Ad,finishListener :FinishWorkListener,act:Context) {
@@ -24,16 +34,25 @@ class DbManager {
       db.child(ad.key?:"no key")
         .child(auth.uid!!)
         //записываем в узел "ad"
-        .child("ad")
+        .child(AD_NODE)
         //addOnCompleteListener сообщает об окончании загрузки на сервер
         .setValue(ad).addOnCompleteListener {
           if (it.isSuccessful) finishListener.onFinish()
 
         }else{  Toast.makeText( act,"Servers try again later", Toast.LENGTH_LONG).show()
-
-        }
-
+    }
   }
+
+  // счетчик просмотров
+  fun adViewed(ad: Ad){
+    //количество просмотров
+    var counter =  ad.viewsCounter.toInt()
+    counter++
+
+    if(auth.uid != null)db.child(ad.key ?: "no_key")
+      .child(INFO_NODE).setValue(InfoItem(counter.toString(), ad.emailCounter, ad.callsCounter))
+  }
+
   //удаляем
   fun deleteAd(ad: Ad, finishListener: FinishWorkListener) {
     if (ad.key == null || ad.uid == null) return
@@ -72,8 +91,22 @@ private  fun readDataFromDb(query: Query, readDataCallbsck: ReadDataCallback?){
         val adArray=ArrayList<Ad>()
         //c помощью цикла достаю объявления
         for (item in snapshot.children) {
-          val ad=item.children.iterator().next().child("ad").getValue(Ad::class.java)
-          if (ad!=null) adArray.add(ad)
+          var ad:Ad ?=null
+          //c помощью цикла из объявления достаю узлы
+          item.children.forEach{
+            //cчитываю обьяыления
+            if (ad==null) ad = it.child(AD_NODE).getValue(Ad::class.java)
+
+          }
+          //cчитываю счетчик (info)
+          val infoItem =item.child(INFO_NODE).getValue(InfoItem::class.java)
+
+          //добавляю полученную инфо (счетчик) в ad
+          ad?.viewsCounter = infoItem?.viewsCounter ?: "0"
+          ad?.emailCounter = infoItem?.emailsCounter ?: "0"
+          ad?.callsCounter = infoItem?.callsCounter ?: "0"
+
+          if (ad!=null) adArray.add(ad!!)
           // Log.d("MyLog", "Data:$ad")
 
         }

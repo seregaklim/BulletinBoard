@@ -36,6 +36,11 @@ class FirebaseViewModel: ViewModel() {
 
     }
 
+    //количество просмотров
+    fun adViewed(ad: Ad){
+        dbManager.adViewed(ad)
+    }
+
     //удаляем
     fun deleteItem(ad: Ad){
         dbManager.deleteAd(ad, object: DbManager.FinishWorkListener{

@@ -193,7 +193,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onDeleteItem(ad: Ad) {
-     firebaseViewModel.deleteItem(ad)
+        firebaseViewModel.deleteItem(ad)
+    }
+
+    override fun onAdViewed(ad: Ad) {
+        firebaseViewModel.adViewed(ad)
     }
 
 }
