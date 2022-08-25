@@ -1,5 +1,7 @@
 package com.seregaklim.bulletinboard.model
 
+import android.content.Context
+import android.widget.Toast
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,7 +17,7 @@ class DbManager {
   val auth = Firebase.auth
 
   //отправляем на сервер
-  fun publishAd(ad: Ad) {
+  fun publishAd(ad: Ad,finishListener :FinishWorkListener,act:Context) {
     //записываем  если
     if (auth.uid !=null)
     //записываем в базу по сгенерированному ключу,ксли null, тогда "no key"
@@ -23,7 +25,13 @@ class DbManager {
         .child(auth.uid!!)
         //записываем в узел "ad"
         .child("ad")
-        .setValue(ad)
+        //addOnCompleteListener сообщает об окончании загрузки на сервер
+        .setValue(ad).addOnCompleteListener {
+          if (it.isSuccessful) finishListener.onFinish()
+
+        }else{  Toast.makeText( act,"Servers try again later", Toast.LENGTH_LONG).show()
+
+        }
 
   }
 
@@ -75,4 +83,10 @@ private  fun readDataFromDb(query: Query, readDataCallbsck: ReadDataCallback?){
   interface ReadDataCallback {
     fun readData(list: ArrayList<Ad>)
   }
+
+  interface FinishWorkListener{
+   //загрузку закончили
+    fun onFinish()
+  }
+
 }

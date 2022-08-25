@@ -1,22 +1,20 @@
 package com.seregaklim.bulletinboard.act
 
-
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-
 import com.fxn.utility.PermUtil
+import com.seregaklim.bulletinboard.MainActivity
 import com.seregaklim.bulletinboard.adapters.ImageAdapter
 import com.seregaklim.bulletinboard.model.Ad
 import com.seregaklim.bulletinboard.model.DbManager
 import com.seregaklim.bulletinboard.databinding.ActivityEditAdsBinding
-
 import com.seregaklim.bulletinboard.dialogs.DialogSpinnerHelper
 import com.seregaklim.bulletinboard.frag.FragmentCloseInterface
 import com.seregaklim.bulletinboard.frag.ImageListFrag
@@ -31,12 +29,14 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     private  val dialog= DialogSpinnerHelper()
     lateinit var imageAdapter : ImageAdapter
     val imagePicker = ImagePicker()
-    //переменная картики, которой хлтим изменить
-    var editImagePos = 0
-
     var launcherMultiSelectImages : ActivityResultLauncher<Intent>? =null
     var launcherSingleSelectImage : ActivityResultLauncher<Intent>? =null
     private val dbManager = DbManager()
+    //переменная картики, которой хлтим изменить
+    var editImagePos = 0
+   //редактирование
+    private var isEditState = false
+    private var ad:Ad?=null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +44,40 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         binding = ActivityEditAdsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         init()
+        checkEditState()
+    }
+
+    //функция проверки редактирования объявления
+    private fun  checkEditState() {
+
+        isEditState =isEditState()
+
+        if (isEditState) {
+
+            ad = intent.getSerializableExtra(MainActivity.ADS_DATA) as Ad
+
+          if (ad !=null)  fillViews(ad!!)
+
+        }
+    }
+
+    //проверяет состояние, зашли для создания нового объявления или редактирования
+  private   fun isEditState():Boolean{
+return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
+    }
+
+    //заполняем при редактировании объявления
+  private   fun fillViews(ad: Ad)= with(binding){
+
+        tvCountry.text=ad.country
+        tvCity.text=ad.city
+        editTel.setText(ad.tel)
+        edIndex.setText(ad.index)
+        checkBoxWithSend.isChecked=ad.withSent.toBoolean()
+        tvCat.text=ad.category
+        edTitle.setText(ad.title)
+        edPrice.setText(ad.price)
+        edDescription.setText(ad.description)
 
     }
 
@@ -111,7 +145,6 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     }
 
 
-
     //запускаем картинку
     fun onClickGetImages(view: View){
         //если нет фото
@@ -164,17 +197,35 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
                 dbManager.auth.uid
             )
         }
-      return ad
+        return ad
     }
 
-//публикуем
+    //публикуем
     fun onClickPublish(view: View){
+        val adEdit = fillAd()
 
-        dbManager.publishAd(fillAd())
+        //если редактирование
+        if(isEditState) {
+
+            dbManager.publishAd(adEdit.copy(key = ad?.key),onPublishFinish(),this)
+        }else {
+
+            dbManager.publishAd(adEdit,onPublishFinish(),this)
+
+
+        }
     }
 
+    //окончание загрузки на сервер
+    private fun onPublishFinish():DbManager.FinishWorkListener{
+        return object :DbManager.FinishWorkListener{
+            override fun onFinish() {
+                //закрываем активити
+                finish()
+            }
 
-
+        }
+    }
 
     //запускаем картинку
     //     fun onClickGetImages(view: View){
