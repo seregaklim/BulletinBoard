@@ -34,6 +34,17 @@ class DbManager {
         }
 
   }
+  //удаляем
+  fun deleteAd(ad: Ad, finishListener: FinishWorkListener) {
+    if (ad.key == null || ad.uid == null) return
+
+    //находим по ключу
+    db.child(ad.key).child(ad.uid).removeValue().addOnCompleteListener {
+      if (it.isSuccessful) finishListener.onFinish()
+
+    }
+  }
+
 
   //достаем объявления все подряд
   fun getAllAds(readDataCallback: ReadDataCallback?){

@@ -21,10 +21,11 @@ import com.seregaklim.bulletinboard.adapters.AdsRcAdapter
 import com.seregaklim.bulletinboard.databinding.ActivityMainBinding
 import com.seregaklim.bulletinboard.dialoghelper.DialogConst
 import com.seregaklim.bulletinboard.dialoghelper.DialogHelper
+import com.seregaklim.bulletinboard.model.Ad
 import com.seregaklim.bulletinboard.viewmodel.FirebaseViewModel
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,AdsRcAdapter.Listener {
 
     lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
     private lateinit var tvAccount: TextView
@@ -189,6 +190,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         const val EDIT_STATE = "edit_state"
         const val ADS_DATA = "ads_data"
         const val SCROLL_DOWN = 1
+    }
+
+    override fun onDeleteItem(ad: Ad) {
+     firebaseViewModel.deleteItem(ad)
     }
 
 }

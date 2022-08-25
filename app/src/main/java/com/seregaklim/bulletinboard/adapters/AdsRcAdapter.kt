@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.seregaklim.bulletinboard.MainActivity
@@ -32,13 +33,14 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
     }
 
     fun updateAdapter(newList: List<Ad>){
-
+        //считывает старый список и новый (обновляет плавно с анимацией)
+        val  diffResult =DiffUtil.calculateDiff(DiffUtilHelper(adArray,newList))
+        //обновляем весь адаптер
+        diffResult.dispatchUpdatesTo(this)
         adArray.clear()
         adArray.addAll(newList)
-        notifyDataSetChanged()
+
     }
-
-
 
     class AdHolder(val binding: AdListItemBinding,val act: MainActivity) : RecyclerView.ViewHolder(binding.root) {
         fun setData(ad: Ad) = with(binding){
@@ -51,6 +53,11 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
 
             //редактируем
             ibEditAd.setOnClickListener(onClickEdit(ad))
+            //удаляем
+            ibDeleteAd.setOnClickListener{
+            act.onDeleteItem(ad)
+            }
+
         }
 
         //редактируем
@@ -84,5 +91,11 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
 
         }
 
+    }
+
+    interface Listener{
+        fun onDeleteItem(ad: Ad)
+//        fun onAdViewed(ad: Ad)
+//        fun onFavClicked(ad: Ad)
     }
 }
