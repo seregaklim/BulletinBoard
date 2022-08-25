@@ -191,13 +191,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         const val ADS_DATA = "ads_data"
         const val SCROLL_DOWN = 1
     }
-
+    //удаление
     override fun onDeleteItem(ad: Ad) {
         firebaseViewModel.deleteItem(ad)
     }
-
+    //счетчик
     override fun onAdViewed(ad: Ad) {
         firebaseViewModel.adViewed(ad)
+    }
+    //лайк(дизлайк)
+    override fun onFavClicked(ad: Ad) {
+        firebaseViewModel.onFavClick(ad)
     }
 
 }

@@ -1,7 +1,6 @@
 package com.seregaklim.bulletinboard.viewmodel
 
-import android.content.Context
-import android.widget.Toast
+
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.seregaklim.bulletinboard.model.Ad
@@ -35,6 +34,27 @@ class FirebaseViewModel: ViewModel() {
         })
 
     }
+
+    //добавление в избранное (лайк, дизлайк)
+    fun onFavClick(ad: Ad){
+        dbManager.onFavClick(ad, object: DbManager.FinishWorkListener{
+            override fun onFinish() {
+                //берем старый список
+                val updatedList = liveAdsData.value
+                //узгаем на какой позиции находится элемент (на которое мы нажали)
+                val pos = updatedList?.indexOf(ad)
+                if(pos != -1){
+                    pos?.let{
+                        val favCounter = if(ad.isFav) ad.favCounter.toInt() - 1 else ad.favCounter.toInt() + 1
+                        updatedList[pos] = updatedList[pos].copy(isFav = !ad.isFav,favCounter = favCounter.toString())
+
+                    }
+                }
+                liveAdsData.postValue(updatedList!!)
+            }
+        })
+    }
+
 
     //количество просмотров
     fun adViewed(ad: Ad){

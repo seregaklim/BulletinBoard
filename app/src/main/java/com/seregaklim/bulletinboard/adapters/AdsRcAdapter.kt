@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.seregaklim.bulletinboard.MainActivity
+import com.seregaklim.bulletinboard.R
 import com.seregaklim.bulletinboard.act.EditAdsAct
 import com.seregaklim.bulletinboard.model.Ad
 import com.seregaklim.bulletinboard.databinding.AdListItemBinding
@@ -49,7 +50,9 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
             tvPrice.text = ad.price
             tvTitle.text=ad.title
             tvViewCounter.text=ad.viewsCounter
+            tvFavCounter.text=ad.favCounter
 
+            isFav(ad)
             showEditPanel(isOwner(ad))
 
             //редактируем
@@ -63,6 +66,20 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
             //счетчик просмотров
             itemView.setOnClickListener {
                 act.onAdViewed(ad)
+            }
+
+            //избранные
+            ibFav.setOnClickListener{
+             act.onFavClicked(ad)
+            }
+
+        }
+        //лайк -дизлайк
+        private fun isFav(ad: Ad){
+            if(ad.isFav) {
+                binding.ibFav.setImageResource(R.drawable.ic_fav_pressed)
+            } else {
+                binding.ibFav.setImageResource(R.drawable.ic_fav_normal)
             }
         }
 
@@ -102,6 +119,6 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
     interface Listener{
         fun onDeleteItem(ad: Ad)
         fun onAdViewed(ad: Ad)
-//        fun onFavClicked(ad: Ad)
+        fun onFavClicked(ad: Ad)
     }
 }
