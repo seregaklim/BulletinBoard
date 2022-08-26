@@ -125,6 +125,15 @@ class DbManager {
   }
 
 
+  ///достаем избранные объявления по моему индификатору
+  fun getMyFavs(readDataCallback: ReadDataCallback?){
+    //фильтруем  "/ad/uid" равен моему индмфикатуру аккаунта auth.uid
+    val query = db.orderByChild( "/favs/${auth.uid}").equalTo(auth.uid)
+    //выдает все объявления с индификатором
+    readDataFromDb(query, readDataCallback)
+  }
+
+
   ///достаем объявления по моему индификатору
   fun getMyAds(readDataCallback: ReadDataCallback?){
        //фильтруем  "/ad/uid" равен моему индмфикатуру аккаунта auth.uid

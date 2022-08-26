@@ -70,7 +70,8 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
 
             //избранные
             ibFav.setOnClickListener{
-             act.onFavClicked(ad)
+            //если пользователь зарегистрированн
+            if (act.mAuth.currentUser?.isAnonymous ==false) act.onFavClicked(ad)
             }
 
         }

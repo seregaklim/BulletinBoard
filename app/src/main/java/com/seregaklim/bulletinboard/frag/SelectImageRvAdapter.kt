@@ -3,11 +3,8 @@ package com.seregaklim.bulletinboard.frag
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.seregaklim.bulletinboard.R
 import com.seregaklim.bulletinboard.act.EditAdsAct
@@ -63,9 +60,7 @@ class SelectImageRvAdapter(val adapterCallback :AdapterCallback) : RecyclerView.
 
 //            //редактируем отдельную фотографию
            viewBinding.  imEditImage.setOnClickListener {
-
-               imagePicker.launcher(context as EditAdsAct,context.launcherSingleSelectImage, imageCounter = 1)
-
+               imagePicker.getSingleImage(context as EditAdsAct,)
                //на позицию , которую нажали
                context.editImagePos=adapterPosition
            }

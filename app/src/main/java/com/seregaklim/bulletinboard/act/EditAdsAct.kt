@@ -1,15 +1,11 @@
 package com.seregaklim.bulletinboard.act
 
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import com.fxn.utility.PermUtil
 import com.seregaklim.bulletinboard.MainActivity
 import com.seregaklim.bulletinboard.adapters.ImageAdapter
 import com.seregaklim.bulletinboard.model.Ad
@@ -29,8 +25,6 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     private  val dialog= DialogSpinnerHelper()
     lateinit var imageAdapter : ImageAdapter
     val imagePicker = ImagePicker()
-    var launcherMultiSelectImages : ActivityResultLauncher<Intent>? =null
-    var launcherSingleSelectImage : ActivityResultLauncher<Intent>? =null
     private val dbManager = DbManager()
     //переменная картики, которой хлтим изменить
     var editImagePos = 0
@@ -82,40 +76,12 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     }
 
 
-    //запрашиваем разрешение досиупа к фотографиям
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-
-
-        when(requestCode){
-            PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS->{
-                if(grantResults.isNotEmpty() && grantResults [0]== PackageManager.PERMISSION_GRANTED){
-                    // isImagesPermissionGranted =true
-
-                    //количество фотографий
-                    imagePicker.launcher(this,launcherMultiSelectImages,3)
-                } else {
-                    //   isImagesPermissionGranted =false
-                    Toast.makeText(this,"Включите, разрешение!!",Toast.LENGTH_LONG).show()
-
-
-                    return
-                }
-
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
 
 
     fun init(){
         imageAdapter = ImageAdapter()
         binding.vpImages.adapter = imageAdapter
-        launcherMultiSelectImages = imagePicker.getLaunherForMultiSelectImages(this)
-        launcherSingleSelectImage = imagePicker.getLauncherForSingleImage(this)
+
 
     }
 
@@ -149,7 +115,7 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     fun onClickGetImages(view: View){
         //если нет фото
         if(imageAdapter.mainArray.size == 0){
-            imagePicker.launcher(this, launcherMultiSelectImages, 3 )
+            imagePicker.getMultiImages(this, 3 )
 //       если есть
         } else {
             openChooseImageFrag(null)
@@ -169,8 +135,9 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     }
 
     //открывает фрагмент
-    fun  openChooseImageFrag (newList:ArrayList<String>?){
-        chooseImageFrag= ImageListFrag(this,newList)
+    fun  openChooseImageFrag (newList:ArrayList<Uri>?){
+        chooseImageFrag= ImageListFrag(this)
+       if (newList !=null) chooseImageFrag?.resizeSelectedImages(newList,true,this)
         binding.scroolViewMain.visibility=View.GONE
         val fm = supportFragmentManager.beginTransaction()
         fm.replace(com.seregaklim.bulletinboard.R.id.place_holder,chooseImageFrag!! )
@@ -226,17 +193,6 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
 
         }
     }
-
-    //запускаем картинку
-    //     fun onClickGetImages(view: View){
-
-//       binding.scroolViewMafin.visibility=View.GONE
-//        val fm = supportFragmentManager.beginTransaction()
-//        fm.replace(com.seregaklim.bulletinboard.R.id.place_holder, ImageListFrag(this))
-//        //чтобы эти изминения применились
-//        fm.commit()
-    //      }
-
 }
 
 
