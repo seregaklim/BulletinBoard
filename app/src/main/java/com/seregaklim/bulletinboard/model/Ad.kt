@@ -12,6 +12,10 @@ data class Ad(
     val title: String? = null,
     val price: String? = null,
     val description: String? = null,
+    //картинки
+    var mainImage: String = "empty",
+    val image2: String = "empty",
+    val image3: String = "empty",
     //генерируем ключ
     val key: String? = null,
     // юзер индификатор
@@ -22,8 +26,10 @@ data class Ad(
     //*****счетчики********
     var viewsCounter: String = "0",
     var emailCounter: String = "0",
-    var callsCounter: String = "0"
+    var callsCounter: String = "0",
     //*********************
+
+
 
     // класс Serializable превращает в байты (для передачи Intenta)
     ):Serializable

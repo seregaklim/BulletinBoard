@@ -11,12 +11,15 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import com.seregaklim.bulletinboard.act.EditAdsAct
 
 
 class DbManager {
 
   val db = Firebase.database.getReference(MAIN_NODE)
   val auth = Firebase.auth
+  val dbStorage = Firebase.storage.getReference(MAIN_NODE)
 
   companion object{
     //объявления
@@ -32,7 +35,7 @@ class DbManager {
 
 
   //отправляем на сервер
-  fun publishAd(ad: Ad,finishListener :FinishWorkListener,act:Context) {
+  fun publishAd(ad: Ad,finishListener :FinishWorkListener,) {
     //записываем  если
     if (auth.uid !=null)
     //записываем в базу по сгенерированному ключу,ксли null, тогда "no key"
@@ -44,10 +47,9 @@ class DbManager {
         .setValue(ad).addOnCompleteListener {
           if (it.isSuccessful) finishListener.onFinish()
 
-        }else{  Toast.makeText( act,"Servers try again later", Toast.LENGTH_LONG).show()
+      //  }else{
     }
   }
-
   // счетчик просмотров
   fun adViewed(ad: Ad){
     //количество просмотров
@@ -120,6 +122,15 @@ class DbManager {
   fun getAllAds(readDataCallback: ReadDataCallback?){
     //фильтруем  "/ad/uid" равен моему индмфикатуру аккаунта auth.uid
     val query = db.orderByChild(auth.uid  + "/ad/price")
+    //выдает все объявления с индификатором
+    readDataFromDb(query, readDataCallback)
+  }
+
+
+  ///достаем избранные объявления по моему индификатору
+  fun getMyFavs(readDataCallback: ReadDataCallback?){
+    //фильтруем  "/ad/uid" равен моему индмфикатуру аккаунта auth.uid
+    val query = db.orderByChild( "/favs/${auth.uid}").equalTo(auth.uid)
     //выдает все объявления с индификатором
     readDataFromDb(query, readDataCallback)
   }

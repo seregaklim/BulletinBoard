@@ -1,5 +1,6 @@
 package com.seregaklim.bulletinboard.adapters
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.LayoutInflater
@@ -37,6 +38,7 @@ class ImageAdapter : RecyclerView.Adapter<ImageAdapter.ImageHolder>() {
     }
 
     //очищаем старый список и его перезаполняем
+    @SuppressLint("NotifyDataSetChanged")
     fun update(newList : ArrayList<Bitmap>){
 
         mainArray.clear()

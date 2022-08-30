@@ -1,20 +1,25 @@
 package com.seregaklim.bulletinboard.frag
 
 import android.app.Activity
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.seregaklim.bulletinboard.databinding.ListImageFragBinding
 import com.seregaklim.bulletinboard.databinding.SelectImageFragItemBinding
 
 //для Banner, разгружаем ImageListFrag
-open class BaseSelectImageFrag:Fragment() {
+open class BaseSelectImageFrag:Fragment(), InterAdsClose {
+    lateinit var adView: AdView
+    open lateinit var binding: ListImageFragBinding
+    var interAd: InterstitialAd? = null
 
-    lateinit var binding: ListImageFragBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,19 +41,19 @@ open class BaseSelectImageFrag:Fragment() {
     override fun onResume() {
         super.onResume()
 
-        binding.adView.resume()
+        adView.resume()
 
     }
 
     override fun onPause() {
         super.onPause()
 
-        binding.adView.pause()
+        adView.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        binding.adView.destroy()
+        adView.destroy()
     }
 
     //загружаю рекламу
@@ -56,6 +61,9 @@ open class BaseSelectImageFrag:Fragment() {
         MobileAds.initialize(activity as Activity)
         val adRequest = AdRequest.Builder().build()
 
-        binding.adView.loadAd(adRequest)
+        adView.loadAd(adRequest)
     }
+
+    override fun onClose() {}
+
 }

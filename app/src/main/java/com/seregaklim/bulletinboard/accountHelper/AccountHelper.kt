@@ -6,37 +6,62 @@ import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.*
 import com.seregaklim.bulletinboard.MainActivity
 import com.seregaklim.bulletinboard.R
+import com.seregaklim.bulletinboard.constants.FirebaseAuthConstants
 
-class AccountHelper(act:MainActivity) {
-    private val act = act
+class AccountHelper(val act:MainActivity) {
+
     private lateinit var signInClient: GoogleSignInClient
 
     // регистр. по почте
     fun signUpWithEmail(email: String, password: String) {
         if (email.isNotEmpty() && password.isNotEmpty()) {
-
-            //добавляем слушатель, который сообщит удалось ли зарегистрироваться
-            act.mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        sendEmailVerification(task.result.user!!)
-                       //показываем email в меню
-                        act.uiUpdate(task.result?.user)
-
-                    } else {
-                        Toast.makeText(
-                            act,
-                            act.resources.getString(R.string.sign_up_error),
-                            Toast.LENGTH_LONG
-                        ).show()
+           //удаляем анонимного юзера
+            act.mAuth.currentUser?.delete()?.addOnCompleteListener{
+                    task->
+                if(task.isSuccessful){
+                    //добавляем слушатель, который сообщит удалось ли зарегистрироваться
+                    act.mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            singUnWithEmailSuccessful(task.result.user!!)
+                        } else {
+                            signUpWithEmailException(task.exception!!, email, password)
+                        }
                     }
                 }
+            }
         }
+    }
+
+
+    //регистрация по email
+    private fun singUnWithEmailSuccessful(user: FirebaseUser){
+        sendEmailVerification(user)
+        //показываем email в меню
+        act.uiUpdate(user)
+    }
+    //регистрация по email -ошибки
+    private fun signUpWithEmailException(e: Exception, email: String, password: String){
+        if (e is FirebaseAuthUserCollisionException) {
+            val exception = e as FirebaseAuthUserCollisionException
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE) {
+                linkEmailToG(email, password)
+            }
+        } else if (e is FirebaseAuthInvalidCredentialsException) {
+            val exception = e as FirebaseAuthInvalidCredentialsException
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
+                Toast.makeText(act, FirebaseAuthConstants.ERROR_INVALID_EMAIL, Toast.LENGTH_LONG).show()
+            }
+        }
+        if (e is FirebaseAuthWeakPasswordException) {
+            //Log.d("MyLog","Exception : ${e.errorCode}")
+            if (e.errorCode == FirebaseAuthConstants.ERROR_WEAK_PASSWORD) {
+                Toast.makeText(act, FirebaseAuthConstants.ERROR_WEAK_PASSWORD, Toast.LENGTH_LONG).show()
+            }
+        }
+        //FirebaseAuthWeakPasswordException
     }
 
 
@@ -61,22 +86,55 @@ class AccountHelper(act:MainActivity) {
     //входим по почте и pass
     fun signInWithEmail(email: String, password: String) {
         if (email.isNotEmpty() && password.isNotEmpty()) {
-
-            //добавляем слушатель, который сообщит удалось ли зарегистрироваться
-            act.mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    act.uiUpdate(task.result?.user)
-
-                } else {
-                    Toast.makeText(
-                        act,
-                        act.resources.getString(R.string.sign_in_error),
-                        Toast.LENGTH_LONG
-                    ).show()
+          //удаляем анонимного пользователя
+            act.mAuth.currentUser?.delete()?.addOnCompleteListener{
+                    task->
+                if(task.isSuccessful){
+                    //добавляем слушатель, который сообщит удалось ли зарегистрироваться
+                    act.mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            //показываем email в меню
+                            act.uiUpdate(task.result?.user)
+                        } else {
+                            signInWithEmailException(task.exception!!, email, password)
+                        }
+                    }
                 }
             }
         }
     }
+
+    //Ошибки - входим по почте и pass
+    private fun signInWithEmailException(e: Exception, email: String, password: String){
+        //Log.d("MyLog", "Exception : ${e}")
+        if (e is FirebaseAuthInvalidCredentialsException) {
+            //Log.d("MyLog","Exception : ${task.exception}")
+            val exception = e as FirebaseAuthInvalidCredentialsException
+            // Log.d("MyLog","Exception 2 : ${exception.errorCode}")
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
+                Toast.makeText(
+                    act,
+                    FirebaseAuthConstants.ERROR_INVALID_EMAIL,
+                    Toast.LENGTH_LONG
+                ).show()
+            } else if (exception.errorCode == FirebaseAuthConstants.ERROR_WRONG_PASSWORD) {
+                Toast.makeText(
+                    act,
+                    FirebaseAuthConstants.ERROR_WRONG_PASSWORD,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } else if (e is FirebaseAuthInvalidUserException) {
+            if (e.errorCode == FirebaseAuthConstants.ERROR_USER_NOT_FOUND) {
+                Toast.makeText(
+                    act,
+                    FirebaseAuthConstants.ERROR_USER_NOT_FOUND,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
 
     //получаем аккаунт из нашего смартфона
     private fun getSignInClient():GoogleSignInClient{
@@ -84,7 +142,6 @@ class AccountHelper(act:MainActivity) {
             .requestIdToken(act.getString(R.string.default_web_client_id)).requestEmail().build()
         return GoogleSignIn.getClient(act,gso)
     }
-
 
 
     //заходим  по Google
@@ -116,13 +173,38 @@ private fun linkEmailToG(email:String, password:String){
     fun signInFirebaseWithGoogle(token: String) {
         val credential = GoogleAuthProvider.getCredential(token, null)
 
+        //удаляем из базы анонимного пользователя
+        act.mAuth.currentUser?.delete()?.addOnCompleteListener { task ->
+            if (task.isSuccessful){
+
+               //после чего проходим Google регистрацию
                 act.mAuth.signInWithCredential(credential).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Toast.makeText(act, "Sign in done", Toast.LENGTH_LONG).show()
                         act.uiUpdate(task.result?.user)
+                    }else{
+                        Log.d("MyLog", "Google Sign In Exception : ${task.exception}")
+                    }
                 }
+            }
         }
+    }
 
+    //вход анонимного пользователя
+    fun signInAnonymously(listener: Listener){
+        act.mAuth.signInAnonymously().addOnCompleteListener{
+                task ->
+            if(task.isSuccessful){
+                listener.onComplete()
+                Toast.makeText(act, "Вы вошли как Гость", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(act, "Не удалось войти как Гость", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    interface Listener{
+        fun onComplete()
     }
 }
 

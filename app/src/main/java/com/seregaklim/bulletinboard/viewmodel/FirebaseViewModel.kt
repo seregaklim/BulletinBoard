@@ -34,6 +34,15 @@ class FirebaseViewModel: ViewModel() {
         })
 
     }
+    //загрузка всех моих Избраных объявлений  (по индификатору)
+    fun loadMyFavs(){
+        dbManager.getMyFavs(object: DbManager.ReadDataCallback{
+            override fun readData(list: ArrayList<Ad>) {
+                liveAdsData.value = list
+            }
+        })
+    }
+
 
     //добавление в избранное (лайк, дизлайк)
     fun onFavClick(ad: Ad){

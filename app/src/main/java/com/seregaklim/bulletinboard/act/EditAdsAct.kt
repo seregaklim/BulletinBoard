@@ -1,15 +1,13 @@
 package com.seregaklim.bulletinboard.act
 
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
+
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import com.fxn.utility.PermUtil
+import com.google.android.gms.tasks.OnCompleteListener
 import com.seregaklim.bulletinboard.MainActivity
 import com.seregaklim.bulletinboard.adapters.ImageAdapter
 import com.seregaklim.bulletinboard.model.Ad
@@ -20,6 +18,7 @@ import com.seregaklim.bulletinboard.frag.FragmentCloseInterface
 import com.seregaklim.bulletinboard.frag.ImageListFrag
 import com.seregaklim.bulletinboard.utils.CityHelper
 import com.seregaklim.bulletinboard.utils.ImagePicker
+import java.io.ByteArrayOutputStream
 
 
 class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
@@ -28,16 +27,14 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     lateinit var binding: ActivityEditAdsBinding
     private  val dialog= DialogSpinnerHelper()
     lateinit var imageAdapter : ImageAdapter
-    val imagePicker = ImagePicker()
-    var launcherMultiSelectImages : ActivityResultLauncher<Intent>? =null
-    var launcherSingleSelectImage : ActivityResultLauncher<Intent>? =null
+  val imagePicker = ImagePicker()
     private val dbManager = DbManager()
     //переменная картики, которой хлтим изменить
     var editImagePos = 0
-   //редактирование
+    private var imageIndex = 0
+    //редактирование
     private var isEditState = false
     private var ad:Ad?=null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,40 +79,12 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     }
 
 
-    //запрашиваем разрешение досиупа к фотографиям
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-
-
-        when(requestCode){
-            PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS->{
-                if(grantResults.isNotEmpty() && grantResults [0]== PackageManager.PERMISSION_GRANTED){
-                    // isImagesPermissionGranted =true
-
-                    //количество фотографий
-                    imagePicker.launcher(this,launcherMultiSelectImages,3)
-                } else {
-                    //   isImagesPermissionGranted =false
-                    Toast.makeText(this,"Включите, разрешение!!",Toast.LENGTH_LONG).show()
-
-
-                    return
-                }
-
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
 
 
     fun init(){
         imageAdapter = ImageAdapter()
         binding.vpImages.adapter = imageAdapter
-        launcherMultiSelectImages = imagePicker.getLaunherForMultiSelectImages(this)
-        launcherSingleSelectImage = imagePicker.getLauncherForSingleImage(this)
+
 
     }
 
@@ -149,7 +118,7 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     fun onClickGetImages(view: View){
         //если нет фото
         if(imageAdapter.mainArray.size == 0){
-            imagePicker.launcher(this, launcherMultiSelectImages, 3 )
+            imagePicker.getMultiImages(this, 3 )
 //       если есть
         } else {
             openChooseImageFrag(null)
@@ -169,8 +138,9 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     }
 
     //открывает фрагмент
-    fun  openChooseImageFrag (newList:ArrayList<String>?){
-        chooseImageFrag= ImageListFrag(this,newList)
+    fun  openChooseImageFrag (newList:ArrayList<Uri>?){
+        chooseImageFrag= ImageListFrag(this)
+       if (newList !=null) chooseImageFrag?.resizeSelectedImages(newList,true,this)
         binding.scroolViewMain.visibility=View.GONE
         val fm = supportFragmentManager.beginTransaction()
         fm.replace(com.seregaklim.bulletinboard.R.id.place_holder,chooseImageFrag!! )
@@ -178,11 +148,15 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
         fm.commit()
     }
 
+
+
+
     //возвращаем заполненноее объявление
     private fun fillAd():Ad {
-        val ad: Ad
+        val adTemp: Ad
         binding.apply {
-            ad = Ad(tvCountry.text.toString(),
+            adTemp = Ad(
+                tvCountry.text.toString(),
                 tvCity.text.toString(),
                 editTel.text.toString(),
                 edIndex.text.toString(),
@@ -191,29 +165,35 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
                 edTitle.text.toString(),
                 edPrice.text.toString(),
                 edDescription.text.toString(),
+                //картинка
+                 "empty",
+                 "empty",
+                 "empty",
                 //генерируем уникальный ключ
                 dbManager.db.push().key,
                 // юзер индификатор
                 dbManager.auth.uid
             )
         }
-        return ad
+        return adTemp
     }
+
+
 
     //публикуем
     fun onClickPublish(view: View){
-        val adEdit = fillAd()
+       ad = fillAd()
 
         //если редактирование
         if(isEditState) {
 
-            dbManager.publishAd(adEdit.copy(key = ad?.key),onPublishFinish(),this)
+            ad!!.copy(key = ad!!.key).let { dbManager.publishAd(it,onPublishFinish()) }
         }else {
 
-            dbManager.publishAd(adEdit,onPublishFinish(),this)
 
-
-        }
+            uploadImages()
+          //  dbManager.publishAd(ad!!,onPublishFinish(), this )
+       }
     }
 
     //окончание загрузки на сервер
@@ -227,15 +207,72 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
         }
     }
 
-    //запускаем картинку
-    //     fun onClickGetImages(view: View){
 
-//       binding.scroolViewMafin.visibility=View.GONE
-//        val fm = supportFragmentManager.beginTransaction()
-//        fm.replace(com.seregaklim.bulletinboard.R.id.place_holder, ImageListFrag(this))
-//        //чтобы эти изминения применились
-//        fm.commit()
-    //      }
+
+//    //проверка картинок по индексу, иначе одна и таже картинка будет перезаписываться
+    private fun setImageUriToAd(uri: String){
+    when(imageIndex){
+            0 -> ad= ad?.copy(mainImage = uri)
+            1 -> ad = ad?.copy(image2 = uri)
+            2 -> ad = ad?.copy(image3 = uri)
+        }
+    }
+
+    //загружаем картинку на сервер Database с ссылкой на нее
+    private fun uploadImages(){
+
+        //если нет картинок,грузим без картинок
+     if (imageAdapter.mainArray.size == imageIndex ){
+   // val ad = fillAd()
+
+         //перезаписываем mainImage, тк получили ссылкe
+        dbManager.publishAd(ad!!,  onPublishFinish(), )
+            return
+        }
+
+        // для одной загруженной картинки (imageAdapter.mainArray[imageIndex])
+        val byteArray=   prepareImageByteArray(imageAdapter.mainArray[imageIndex])
+        uploadImage(byteArray){
+
+            //перезаписываем mainImage, тк получили ссылку
+            //  dbManager.publishAd(ad!!.copy(mainImage = uri.result.toString()),onPublishFinish(),this)
+         nextImage(it.result.toString())
+        }
+    }
+
+
+
+    //счетчик фотографий для загрузки на сервер
+    private fun nextImage(uri: String){
+        setImageUriToAd(uri)
+        imageIndex++
+        uploadImages()
+    }
+
+
+
+    //загружаем одну картинку dbStorage
+    private fun uploadImage(byteArray: ByteArray, listener: OnCompleteListener<Uri>){
+        val imStorageRef = dbManager.dbStorage
+            .child(dbManager.auth.uid!!)
+            //название картинки, используем системное время
+            .child("image_${System.currentTimeMillis()}")
+        //превращаем в байты
+        val upTask = imStorageRef.putBytes(byteArray)
+        //когда все загрузиться, получаем ссылку
+        upTask.continueWithTask {
+            task -> imStorageRef.downloadUrl
+        }.addOnCompleteListener(listener)
+    }
+
+    //конвектируем в  формат картинки в байты
+    private fun prepareImageByteArray(bitmap:Bitmap):ByteArray{
+      val outStream =ByteArrayOutputStream()
+     //сжимаем в формат Jpeg
+      bitmap.compress(Bitmap.CompressFormat.JPEG,20,outStream)
+       return outStream.toByteArray()
+    }
+
 
 }
 

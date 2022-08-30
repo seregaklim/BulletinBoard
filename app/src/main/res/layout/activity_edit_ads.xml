@@ -14,14 +14,25 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btPublish"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onClickPublish"
+                android:text="@string/publish"
+                android:textColor="@color/green_main"
+                app:backgroundTint="@color/white" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardImage"
@@ -182,6 +193,7 @@
                         android:inputType="number"
                         android:padding="10dp"
                         android:textColorHint="@color/grey_dark" />
+
                     <TextView
                         android:id="@+id/tvTitleEmail"
                         android:layout_width="match_parent"
@@ -411,16 +423,6 @@
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <Button
-                android:id="@+id/btPublish"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:onClick="onClickPublish"
-                android:text="@string/publish"
-                android:textColor="@color/green_main"
-                app:backgroundTint="@color/white" />
 
         </LinearLayout>
     </ScrollView>

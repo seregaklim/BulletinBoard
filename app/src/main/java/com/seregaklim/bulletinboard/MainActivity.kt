@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -16,6 +18,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.seregaklim.bulletinboard.accountHelper.AccountHelper
 import com.seregaklim.bulletinboard.act.EditAdsAct
 import com.seregaklim.bulletinboard.adapters.AdsRcAdapter
 import com.seregaklim.bulletinboard.databinding.ActivityMainBinding
@@ -23,12 +26,14 @@ import com.seregaklim.bulletinboard.dialoghelper.DialogConst
 import com.seregaklim.bulletinboard.dialoghelper.DialogHelper
 import com.seregaklim.bulletinboard.model.Ad
 import com.seregaklim.bulletinboard.viewmodel.FirebaseViewModel
+import com.squareup.picasso.Picasso
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,AdsRcAdapter.Listener {
 
-    lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
     private lateinit var tvAccount: TextView
+    private lateinit var imAccount: ImageView
+    lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
     private lateinit var binding: ActivityMainBinding
     private val dialogHelper = DialogHelper(this)
     val mAuth = Firebase.auth
@@ -64,6 +69,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //следит за обновлением данных
         firebaseViewModel.liveAdsData.observe(this,{
             adapter.updateAdapter(it)
+       //если в адаптере пусто , выводим сообщение
+       binding.mainContent.tvEmpty.visibility =if (it.isEmpty()) View.VISIBLE else View.GONE
+
         })
     }
 
@@ -103,7 +111,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     mainContent.toolbar.title = getString(R.string.ad_my_ads)
                 }
                 R.id.id_favs -> {
-                    // firebaseViewModel.loadMyFavs()
+                     firebaseViewModel.loadMyFavs()
                 }
                 R.id.id_home -> {
                     firebaseViewModel.loadAllAds()
@@ -124,7 +132,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
     }
-
 
     //меню drawerLayout
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -158,6 +165,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dialogHelper.createSignDialog(DialogConst.SIGN_IN_STATE)
             }
             R.id.id_sign_out -> {
+                // если mAuth.currentUser ==null
+                if (mAuth.currentUser?.isAnonymous ==true){
+                    //закрывает
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                    return true
+                }
                 //меняет текст
                 uiUpdate(null)
                 mAuth.signOut()
@@ -175,22 +188,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onStart()
         uiUpdate(mAuth.currentUser)
     }
-    //показываем email или просим зарег.
+
+    //показываем email или гость - зарег мы или нет
     fun uiUpdate(user: FirebaseUser?) {
-        tvAccount.text =if (user == null) {
-            resources.getString(R.string.not_reg)
-        } else  {
-            user.email
+        if (user == null) {
+            //заходим как гость
+            dialogHelper.accHelper.signInAnonymously(object : AccountHelper.Listener {
+                override fun onComplete() {
+                    tvAccount.setText(R.string.sign_anonim)
+                    //  imAccount.setImageResource(R.drawable.ic_account_def)
+                }
+            })
+        } else if (user.isAnonymous){
+            tvAccount.setText(R.string.sign_anonim)
+
+        }else if (!user.isAnonymous){
+           tvAccount.text= user.email
         }
     }
 
-    //константы MainActivity
-    companion object{
-
-        const val EDIT_STATE = "edit_state"
-        const val ADS_DATA = "ads_data"
-        const val SCROLL_DOWN = 1
-    }
     //удаление
     override fun onDeleteItem(ad: Ad) {
         firebaseViewModel.deleteItem(ad)
@@ -204,4 +220,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         firebaseViewModel.onFavClick(ad)
     }
 
+    //константы MainActivity
+    companion object{
+        const val EDIT_STATE = "edit_state"
+        const val ADS_DATA = "ads_data"
+        const val SCROLL_DOWN = 1
+    }
 }

@@ -13,6 +13,7 @@ import com.seregaklim.bulletinboard.R
 import com.seregaklim.bulletinboard.act.EditAdsAct
 import com.seregaklim.bulletinboard.model.Ad
 import com.seregaklim.bulletinboard.databinding.AdListItemBinding
+import com.squareup.picasso.Picasso
 import kotlin.collections.ArrayList
 
 class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdHolder>() {
@@ -52,28 +53,34 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
             tvViewCounter.text=ad.viewsCounter
             tvFavCounter.text=ad.favCounter
 
+            Picasso.get().load(ad.image3).into(mainImage)
+//            Picasso.get().load(ad.image2).into(mainImage)
+//            Picasso.get().load(ad.mainImage).into(mainImage)
             isFav(ad)
             showEditPanel(isOwner(ad))
+            mainOnClick(ad)
+        }
 
+        private fun mainOnClick(ad: Ad) = with(binding){
+            //избранные
+            ibFav.setOnClickListener{
+                //если пользователь зарегистрированн
+                if (act.mAuth.currentUser?.isAnonymous ==false) act.onFavClicked(ad)
+            }
+            //счетчик просмотров
+            itemView.setOnClickListener {
+                act.onAdViewed(ad)
+            }
             //редактируем
             ibEditAd.setOnClickListener(onClickEdit(ad))
 
             //удаляем
             ibDeleteAd.setOnClickListener{
-            act.onDeleteItem(ad)
-            }
-
-            //счетчик просмотров
-            itemView.setOnClickListener {
-                act.onAdViewed(ad)
-            }
-
-            //избранные
-            ibFav.setOnClickListener{
-             act.onFavClicked(ad)
+                act.onDeleteItem(ad)
             }
 
         }
+
         //лайк -дизлайк
         private fun isFav(ad: Ad){
             if(ad.isFav) {

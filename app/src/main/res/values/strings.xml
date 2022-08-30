@@ -35,6 +35,8 @@
     <string name="send_verification_error">Неудалось отправить email для потверждения!</string>
     <string name="send_verification_done">На вашу почту была отправленна ссылка для подверждения
         вашего аккаунта, пожалуйста подтвердите ваш аккаунт!</string>
+    <string name="sign_anonim">Гость</string>
+
     <!-- Sign Dialog -->
     <string name="link_done">Email успешно подключен к Google аккаунту</string>
     <string name="enter_to_g">У вас уже есть аккаунт с этим Email адресом войдите по нему.</string>
