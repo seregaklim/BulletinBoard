@@ -27,7 +27,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     lateinit var binding: ActivityEditAdsBinding
     private  val dialog= DialogSpinnerHelper()
     lateinit var imageAdapter : ImageAdapter
-  val imagePicker = ImagePicker()
+    val imagePicker = ImagePicker()
     private val dbManager = DbManager()
     //переменная картики, которой хлтим изменить
     var editImagePos = 0
@@ -207,8 +207,6 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
         }
     }
 
-
-
 //    //проверка картинок по индексу, иначе одна и таже картинка будет перезаписываться
     private fun setImageUriToAd(uri: String){
     when(imageIndex){
@@ -272,7 +270,6 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
       bitmap.compress(Bitmap.CompressFormat.JPEG,20,outStream)
        return outStream.toByteArray()
     }
-
 
 }
 

@@ -29,15 +29,15 @@ class ImagePicker {
     //для выбранной картинки
     val REQUEST_CODE_GET_SINGLE_IMAGE = 998
 
-   private fun  getOptions(imageCounter:Int): Options {
-       val options = Options().apply {
-           count = imageCounter //количество картино
-           isFrontFacing = false
-           mode = Mode.Picture
-           path = "/pix/images"
-       }
+    private fun  getOptions(imageCounter:Int): Options {
+        val options = Options().apply {
+            count = imageCounter //количество картино
+            isFrontFacing = false
+            mode = Mode.Picture
+            path = "/pix/images"
+        }
 
-    return options
+        return options
     }
 
     //открыввает фрагмент от библиотеки Pix, и передаем кол-во картинок

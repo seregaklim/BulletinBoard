@@ -15,9 +15,14 @@ import com.seregaklim.bulletinboard.databinding.ListImageFragBinding
 import com.seregaklim.bulletinboard.databinding.SelectImageFragItemBinding
 
 //для Banner, разгружаем ImageListFrag
+
 open class BaseSelectImageFrag:Fragment(), InterAdsClose {
     lateinit var adView: AdView
     open lateinit var binding: ListImageFragBinding
+
+open class BaseSelectImageFrag:Fragment() {
+    lateinit var adView: AdView
+   open lateinit var binding: ListImageFragBinding
     var interAd: InterstitialAd? = null
 
 
@@ -64,6 +69,7 @@ open class BaseSelectImageFrag:Fragment(), InterAdsClose {
         adView.loadAd(adRequest)
     }
 
-    override fun onClose() {}
 
+}
+    override fun onClose() {}
 }

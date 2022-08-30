@@ -77,6 +77,20 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
             //удаляем
             ibDeleteAd.setOnClickListener{
                 act.onDeleteItem(ad)
+
+                act.onDeleteItem(ad)
+            }
+
+            //счетчик просмотров
+            itemView.setOnClickListener {
+                act.onAdViewed(ad)
+            }
+
+            //избранные
+            ibFav.setOnClickListener{
+            //если пользователь зарегистрированн
+            if (act.mAuth.currentUser?.isAnonymous ==false) act.onFavClicked(ad)
+
             }
 
         }
