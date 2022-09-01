@@ -12,6 +12,7 @@ data class Ad(
     val title: String? = null,
     val price: String? = null,
     val description: String? = null,
+    val email: String? = null,
     //картинки
     var mainImage: String = "empty",
     val image2: String = "empty",

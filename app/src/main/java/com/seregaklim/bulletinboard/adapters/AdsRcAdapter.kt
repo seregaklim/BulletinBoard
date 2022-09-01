@@ -20,8 +20,6 @@ import kotlin.collections.ArrayList
 class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdHolder>() {
     val adArray = ArrayList<Ad>()
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdHolder {
         val binding = AdListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AdHolder(binding,act)
@@ -82,7 +80,7 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
                 act.onDeleteItem(ad)
             }
 
-            //счетчик просмотров
+            //счетчик просмотров, переход на страничку
             itemView.setOnClickListener {
                 act.onAdViewed(ad)
             }
@@ -91,17 +89,7 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
             ibFav.setOnClickListener{
                 //если пользователь зарегистрированн
                 if (act.mAuth.currentUser?.isAnonymous ==false) act.onFavClicked(ad)
-
             }
-
-            //нажимаем на весь элемент
-            itemView.setOnClickListener{
-                val  i =Intent (binding.root.context,DescriptionActivity::class.java)
-                i.putExtra("AD",ad)
-                // переходим в другой активити
-                binding.root.context.startActivity(i)
-            }
-
         }
 
         //лайк -дизлайк

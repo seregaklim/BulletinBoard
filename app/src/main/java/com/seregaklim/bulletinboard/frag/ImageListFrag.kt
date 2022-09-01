@@ -83,10 +83,6 @@ AdapterCallback{
 
     }
 
-
-
-
-
        //загружаем фото, через курутины с помощью ImageManager
     fun resizeSelectedImages(newList: ArrayList<Uri>,needClear: Boolean,activity: Activity){
 
@@ -106,7 +102,6 @@ AdapterCallback{
         }
 
     }
-
 
     //меню бара
     private fun setUpToolbar() {

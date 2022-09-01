@@ -36,7 +36,6 @@ class ImagePicker {
             mode = Mode.Picture
             path = "/pix/images"
         }
-
         return options
     }
 
@@ -47,9 +46,7 @@ class ImagePicker {
             when (result.status) {
                 PixEventCallback.Status.SUCCESS ->{
                     getMultiSelectedImages (edAct,result.data)
-
                 }
-
                 else -> {}
             }
         }
@@ -108,16 +105,14 @@ class ImagePicker {
                 edAct.binding.pBarLoad.visibility=View.VISIBLE
                 val  bitMapArray =ImageManager.imageResize(uris as ArrayList<Uri>,edAct) as ArrayList<Bitmap>
                 edAct.binding.pBarLoad.visibility=View.GONE
-                edAct.imageAdapter.update(bitMapArray)
+                edAct.adapter.update(bitMapArray)
                 closePixFrag(edAct)
             }
         }
     }
 
-
     //функция, для одрной картинки которую мы выбрали
     private fun singleImage(edAct: EditAdsAct, uri: Uri){
         edAct.chooseImageFrag?.setSingleImage(uri, edAct.editImagePos)
     }
-
 }

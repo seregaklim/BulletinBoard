@@ -38,7 +38,6 @@ class RcViewDialogSpinnerAdapter(var tvSelection: TextView, var dialog: AlertDia
             tvSelection.text = itemText
             dialog.dismiss()
         }
-
     }
 
     fun updateAdapter(list : ArrayList<String>){

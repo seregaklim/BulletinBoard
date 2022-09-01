@@ -56,9 +56,7 @@ class SelectImageRvAdapter(val adapterCallback :AdapterCallback) : RecyclerView.
         fun setData(bitmap: Bitmap){
             val imagePicker= ImagePicker()
             val imageManager = ImageManager
-
-
-//            //редактируем отдельную фотографию
+            //редактируем отдельную фотографию
            viewBinding.  imEditImage.setOnClickListener {
                imagePicker.getSingleImage(context as EditAdsAct,)
                //на позицию , которую нажали

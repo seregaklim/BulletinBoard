@@ -9,10 +9,10 @@ import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
 import androidx.core.net.toUri
+import com.seregaklim.bulletinboard.adapters.ImageAdapter
+import com.seregaklim.bulletinboard.model.Ad
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 import java.io.File
 import java.io.InputStream
@@ -93,7 +93,7 @@ object ImageManager {
 
 
     //функция битамапов, без жатия картинок, полученный из Storage
-    suspend  fun getBitmapFromUris (uris: List<String?>):List<Bitmap> = withContext(Dispatchers.IO){
+  private  suspend  fun getBitmapFromUris (uris: List<String?>):List<Bitmap> = withContext(Dispatchers.IO){
 
         val bitmapList = ArrayList<Bitmap>()
 
@@ -108,6 +108,15 @@ object ImageManager {
         return@withContext bitmapList
     }
 
+    //функция будет заполнять наш массив c cсылками
+    fun  fillImageArray(ad: Ad,adapter:ImageAdapter) {
+        val  listUris = listOf(ad.mainImage,ad.image2,ad.image3)
+        CoroutineScope(Dispatchers.Main).launch {
+            //достаем все бипмапы
+            val bitMapList =getBitmapFromUris(listUris)
+            adapter.update(bitMapList as ArrayList<Bitmap>)
+        }
+    }
 
 }
 

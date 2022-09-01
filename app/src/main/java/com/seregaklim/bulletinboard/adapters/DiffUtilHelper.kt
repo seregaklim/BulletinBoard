@@ -11,7 +11,6 @@ class DiffUtilHelper(val oldList: List<Ad>, val newList: List<Ad>) : DiffUtil.Ca
         return oldList.size
     }
 
-
     override fun getNewListSize(): Int {
         return newList.size
     }

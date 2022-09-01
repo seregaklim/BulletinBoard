@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.tasks.OnCompleteListener
 import com.seregaklim.bulletinboard.MainActivity
 import com.seregaklim.bulletinboard.adapters.ImageAdapter
@@ -17,6 +18,7 @@ import com.seregaklim.bulletinboard.dialogs.DialogSpinnerHelper
 import com.seregaklim.bulletinboard.frag.FragmentCloseInterface
 import com.seregaklim.bulletinboard.frag.ImageListFrag
 import com.seregaklim.bulletinboard.utils.CityHelper
+import com.seregaklim.bulletinboard.utils.ImageManager
 import com.seregaklim.bulletinboard.utils.ImagePicker
 import java.io.ByteArrayOutputStream
 
@@ -26,7 +28,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     var chooseImageFrag : ImageListFrag? = null
     lateinit var binding: ActivityEditAdsBinding
     private  val dialog= DialogSpinnerHelper()
-    lateinit var imageAdapter : ImageAdapter
+    lateinit var adapter : ImageAdapter
     val imagePicker = ImagePicker()
     private val dbManager = DbManager()
     //переменная картики, которой хлтим изменить
@@ -42,6 +44,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         setContentView(binding.root)
         init()
         checkEditState()
+        imageChangeCounter()
     }
 
     //функция проверки редактирования объявления
@@ -75,15 +78,13 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
         edTitle.setText(ad.title)
         edPrice.setText(ad.price)
         edDescription.setText(ad.description)
-
+        //картинки
+        ImageManager.fillImageArray(ad,adapter)
     }
 
-
-
-
     fun init(){
-        imageAdapter = ImageAdapter()
-        binding.vpImages.adapter = imageAdapter
+        adapter = ImageAdapter()
+        binding.vpImages.adapter = adapter
 
 
     }
@@ -117,24 +118,22 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     //запускаем картинку
     fun onClickGetImages(view: View){
         //если нет фото
-        if(imageAdapter.mainArray.size == 0){
+        if(adapter.mainArray.size == 0){
             imagePicker.getMultiImages(this, 3 )
 //       если есть
         } else {
             openChooseImageFrag(null)
 
-            chooseImageFrag?.updateAdapterFromEdit(imageAdapter.mainArray)
+            chooseImageFrag?.updateAdapterFromEdit(adapter.mainArray)
         }
-
     }
 
     //при закрытии фрагмента, получаем данные с ImageAdapter
     override fun onFragClose(list:ArrayList<Bitmap>) {
         binding.scroolViewMain.visibility=View.VISIBLE
-        imageAdapter.update(list)
+        adapter.update(list)
         //очищаем данные фрагмента
         chooseImageFrag=null
-
     }
 
     //открывает фрагмент
@@ -147,8 +146,6 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
         //чтобы эти изминения применились
         fm.commit()
     }
-
-
 
 
     //возвращаем заполненноее объявление
@@ -165,6 +162,7 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
                 edTitle.text.toString(),
                 edPrice.text.toString(),
                 edDescription.text.toString(),
+                editEmail.text.toString(),
                 //картинка
                  "empty",
                  "empty",
@@ -174,11 +172,10 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
                 // юзер индификатор
                 dbManager.auth.uid
             )
+
         }
         return adTemp
     }
-
-
 
     //публикуем
     fun onClickPublish(view: View){
@@ -220,7 +217,7 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
     private fun uploadImages(){
 
         //если нет картинок,грузим без картинок
-     if (imageAdapter.mainArray.size == imageIndex ){
+     if (adapter.mainArray.size == imageIndex ){
    // val ad = fillAd()
 
          //перезаписываем mainImage, тк получили ссылкe
@@ -229,7 +226,7 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
         }
 
         // для одной загруженной картинки (imageAdapter.mainArray[imageIndex])
-        val byteArray=   prepareImageByteArray(imageAdapter.mainArray[imageIndex])
+        val byteArray=   prepareImageByteArray(adapter.mainArray[imageIndex])
         uploadImage(byteArray){
 
             //перезаписываем mainImage, тк получили ссылку
@@ -238,16 +235,12 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
         }
     }
 
-
-
     //счетчик фотографий для загрузки на сервер
     private fun nextImage(uri: String){
         setImageUriToAd(uri)
         imageIndex++
         uploadImages()
     }
-
-
 
     //загружаем одну картинку dbStorage
     private fun uploadImage(byteArray: ByteArray, listener: OnCompleteListener<Uri>){
@@ -271,6 +264,16 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
        return outStream.toByteArray()
     }
 
+    //счетчик фотографий
+    private fun imageChangeCounter(){
+        binding.vpImages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                val imageCounter = "${position + 1}/${binding.vpImages.adapter?.itemCount}"
+                binding.tvImageCounter.text = imageCounter
+            }
+        })
+    }
 }
 
 

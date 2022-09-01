@@ -3,6 +3,9 @@ package com.seregaklim.bulletinboard
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -10,15 +13,20 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.seregaklim.bulletinboard.accountHelper.AccountHelper
+import com.seregaklim.bulletinboard.act.DescriptionActivity
 import com.seregaklim.bulletinboard.act.EditAdsAct
 import com.seregaklim.bulletinboard.adapters.AdsRcAdapter
 import com.seregaklim.bulletinboard.databinding.ActivityMainBinding
@@ -52,27 +60,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         init()
         initRecyclerView()
         initViewModel()
-
         firebaseViewModel.loadAllAds()
         bottomMenuOnClick()
-    }
-
-    //при возврте на @MainActivity высвечивалась иконка на нижнем тулбаре
-    override fun onResume() {
-        super.onResume()
-        binding.mainContent.bNavView.selectedItemId = R.id.id_home
-        // binding.mainContent.adView2.resume()
-    }
-
-
-    private fun initViewModel(){
-        //следит за обновлением данных
-        firebaseViewModel.liveAdsData.observe(this,{
-            adapter.updateAdapter(it)
-       //если в адаптере пусто , выводим сообщение
-       binding.mainContent.tvEmpty.visibility =if (it.isEmpty()) View.VISIBLE else View.GONE
-
-        })
     }
 
     private fun init (){
@@ -86,6 +75,48 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.setNavigationItemSelectedListener(this)
         //инициализируем Header ,показываем Email (индекс 0,т.к он один)
         tvAccount = binding.navView.getHeaderView(0).findViewById(R.id.tvAccountEmail)
+        //инициализируем Header ,показываем аватарку (индекс 0,т.к он один)
+        imAccount = binding.navView.getHeaderView(0).findViewById(R.id.imAccountImage)
+
+        navViewSettings()
+        onActivityResult()
+    }
+
+    //при возврте на @MainActivity высвечивалась иконка на нижнем тулбаре
+    override fun onResume() {
+        super.onResume()
+        binding.mainContent.bNavView.selectedItemId = R.id.id_home
+        // binding.mainContent.adView2.resume()
+    }
+
+
+    private fun onActivityResult() {
+      //когда выбрали аккаунт
+        googleSignInLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                if (account != null) {
+                    Log.d("MyLog", "Api 0")
+                    dialogHelper.accHelper.signInFirebaseWithGoogle(account.idToken!!)
+                }
+            } catch (e: ApiException) {
+                Log.d("MyLog", "Api error : ${e.message}")
+            }
+        }
+
+    }
+
+    private fun initViewModel(){
+        //следит за обновлением данных
+        firebaseViewModel.liveAdsData.observe(this,{
+            adapter.updateAdapter(it)
+       //если в адаптере пусто , выводим сообщение
+       binding.mainContent.tvEmpty.visibility =if (it.isEmpty()) View.VISIBLE else View.GONE
+
+        })
     }
 
     //нижний тулбар
@@ -189,22 +220,45 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         uiUpdate(mAuth.currentUser)
     }
 
-    //показываем email или гость - зарег мы или нет
+    //показываем email и аватарку  или гость - зарег мы или нет
     fun uiUpdate(user: FirebaseUser?) {
         if (user == null) {
             //заходим как гость
             dialogHelper.accHelper.signInAnonymously(object : AccountHelper.Listener {
                 override fun onComplete() {
                     tvAccount.setText(R.string.sign_anonim)
-                    //  imAccount.setImageResource(R.drawable.ic_account_def)
+                      imAccount.setImageResource(R.drawable.ic_account_def)
                 }
             })
         } else if (user.isAnonymous){
             tvAccount.setText(R.string.sign_anonim)
-
+            imAccount.setImageResource(R.drawable.ic_account_def)
         }else if (!user.isAnonymous){
            tvAccount.text= user.email
+            Picasso.get().load(user.photoUrl).into(imAccount)
         }
+    }
+
+    //меняем цвет фидера (меню)
+    private fun navViewSettings() = with(binding){
+        val menu = navView.menu
+        val adsCat = menu.findItem(R.id.adsCat)
+        //SpannableString позволяет менять цвет,шрифт по буквам
+        val spanAdsCat = SpannableString(adsCat.title)
+        spanAdsCat.setSpan(ForegroundColorSpan(
+            ContextCompat.getColor(this@MainActivity, R.color.color_red)),
+            //откуда красим и до куда
+            0, adsCat.title.length, 0)
+        //передаем покрашенный текст
+        adsCat.title = spanAdsCat
+
+        //красим по аналогии следующий элемент
+        val accCat = menu.findItem(R.id.accCat)
+        val spanAccCat = SpannableString(accCat.title)
+        spanAccCat.setSpan(ForegroundColorSpan(
+            ContextCompat.getColor(this@MainActivity, R.color.green_main)),
+            0, accCat.title.length, 0)
+        accCat.title = spanAccCat
     }
 
     //удаление
@@ -214,6 +268,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //счетчик
     override fun onAdViewed(ad: Ad) {
         firebaseViewModel.adViewed(ad)
+        val  i =Intent (this, DescriptionActivity::class.java)
+        i.putExtra("AD",ad)
+        // переходим в другой активити
+        startActivity(i)
+
     }
     //лайк(дизлайк)
     override fun onFavClicked(ad: Ad) {

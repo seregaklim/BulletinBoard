@@ -44,7 +44,6 @@ class DialogHelper(act: MainActivity) {
         dialog.show()
     }
 
-
     //меню
     private fun setDialogState(index: Int, rootDialogElement: SignDialogBinding) {
         if (index==DialogConst.SIGN_UP_STATE){
@@ -62,7 +61,6 @@ class DialogHelper(act: MainActivity) {
             rootDialogElement.btForgetP.visibility = View.VISIBLE
         }
     }
-
 
     //востановление пароля
     private fun setOnClickResetPassword(rootDialogElement: SignDialogBinding, dialog: AlertDialog?) {
@@ -95,7 +93,6 @@ class DialogHelper(act: MainActivity) {
 
             accHelper.signInWithEmail(rootDialogElement.edSignEmail.text.toString(),
                 rootDialogElement.edSignPassword.text.toString())
-
         }
     }
 }
