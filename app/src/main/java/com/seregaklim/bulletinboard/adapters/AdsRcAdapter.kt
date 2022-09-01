@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.seregaklim.bulletinboard.MainActivity
 import com.seregaklim.bulletinboard.R
+import com.seregaklim.bulletinboard.act.DescriptionActivity
 import com.seregaklim.bulletinboard.act.EditAdsAct
 import com.seregaklim.bulletinboard.model.Ad
 import com.seregaklim.bulletinboard.databinding.AdListItemBinding
@@ -88,9 +89,17 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
 
             //избранные
             ibFav.setOnClickListener{
-            //если пользователь зарегистрированн
-            if (act.mAuth.currentUser?.isAnonymous ==false) act.onFavClicked(ad)
+                //если пользователь зарегистрированн
+                if (act.mAuth.currentUser?.isAnonymous ==false) act.onFavClicked(ad)
 
+            }
+
+            //нажимаем на весь элемент
+            itemView.setOnClickListener{
+                val  i =Intent (binding.root.context,DescriptionActivity::class.java)
+                i.putExtra("AD",ad)
+                // переходим в другой активити
+                binding.root.context.startActivity(i)
             }
 
         }

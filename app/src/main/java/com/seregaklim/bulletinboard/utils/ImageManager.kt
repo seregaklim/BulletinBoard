@@ -91,5 +91,23 @@ object ImageManager {
         return@withContext bitmapList
     }
 
+
+    //функция битамапов, без жатия картинок, полученный из Storage
+    suspend  fun getBitmapFromUris (uris: List<String?>):List<Bitmap> = withContext(Dispatchers.IO){
+
+        val bitmapList = ArrayList<Bitmap>()
+
+        for(i in uris.indices){
+            ///kotlin.runCatching покажет ошибку
+             kotlin.runCatching {
+
+                bitmapList.add(Picasso.get().load(uris[i]).get())
+            }
+         //   Log.d("MyLog","Bitmap load done :${e.isSuccess}")
+        }
+        return@withContext bitmapList
+    }
+
+
 }
 

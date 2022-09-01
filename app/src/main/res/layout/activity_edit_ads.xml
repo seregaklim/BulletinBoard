@@ -4,35 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/place_holder"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/grey_dark"
     tools:context=".act.EditAdsAct">
 
     <ScrollView
         android:id="@+id/scroolViewMain"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:orientation="vertical">
-
-            <Button
-                android:id="@+id/btPublish"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="onClickPublish"
-                android:text="@string/publish"
-                android:textColor="@color/green_main"
-                app:backgroundTint="@color/white" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardImage"
@@ -43,7 +32,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_margin="5dp">
 
                     <androidx.viewpager2.widget.ViewPager2
@@ -99,14 +88,14 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardAddress"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="5dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <TextView
@@ -294,7 +283,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardCategory"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="5dp">
@@ -423,6 +412,25 @@
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btPublish"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:onClick="onClickPublish"
+                android:text="@string/publish"
+                android:textColor="@color/green_main"
+                app:backgroundTint="@color/white" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginBottom="10dp"
+                android:text=""
+                android:textColor="@color/green_main"
+                android:textStyle="bold" />
 
         </LinearLayout>
     </ScrollView>
