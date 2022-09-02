@@ -164,13 +164,14 @@ return intent.getBooleanExtra(MainActivity.EDIT_STATE,false)
                 edDescription.text.toString(),
                 editEmail.text.toString(),
                 //картинка
-                 "empty",
-                 "empty",
-                 "empty",
+                "empty",
+                "empty",
+                "empty",
                 //генерируем уникальный ключ
                 dbManager.db.push().key,
                 // юзер индификатор
-                dbManager.auth.uid
+                dbManager.auth.uid,
+                 System.currentTimeMillis().toString()
             )
 
         }

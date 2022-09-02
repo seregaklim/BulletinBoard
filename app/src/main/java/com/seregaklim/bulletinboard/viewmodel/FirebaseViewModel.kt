@@ -12,9 +12,9 @@ class FirebaseViewModel: ViewModel() {
     //класс следящий за всеси  изменениями , когда нужно обновить View
     val liveAdsData = MutableLiveData<ArrayList<Ad>>()
 
-      //загрузка всех объявлений
-      fun loadAllAds(){
-        dbManager.getAllAds(object :DbManager.ReadDataCallback{
+      //загрузка всех объявлений по времени (опред. кол-во объявлений)
+      fun loadAllAds(lastTime:String){
+        dbManager.getAllAds(lastTime ,object :DbManager.ReadDataCallback{
 
             override fun readData(list: ArrayList<Ad>) {
 

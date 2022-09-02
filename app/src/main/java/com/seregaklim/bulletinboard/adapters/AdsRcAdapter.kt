@@ -33,15 +33,38 @@ class AdsRcAdapter(val act:MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdH
         return adArray.size
     }
 
+
+
     fun updateAdapter(newList: List<Ad>){
+        val tempArray =ArrayList<Ad>()
+        //добавляем старый список
+        tempArray.addAll(adArray)
+        // добавляем новый список
+        tempArray.addAll(newList)
         //считывает старый список и новый (обновляет плавно с анимацией)
-        val  diffResult =DiffUtil.calculateDiff(DiffUtilHelper(adArray,newList))
+        val  diffResult =DiffUtil.calculateDiff(DiffUtilHelper(adArray,tempArray))
         //обновляем весь адаптер
         diffResult.dispatchUpdatesTo(this)
+        //стираем старый список
         adArray.clear()
+        //добавляем новый
+        adArray.addAll(tempArray)
+
+    }
+   //загружаются первые объявления
+ fun   updateAdapterWithClear(newList: List<Ad>){
+        //считывает  новый (обновляет плавно с анимацией)
+        val  diffResult =DiffUtil.calculateDiff(DiffUtilHelper(adArray, newList ))
+        //обновляем весь адаптер
+        diffResult.dispatchUpdatesTo(this)
+        //стираем старый список
+        adArray.clear()
+        //добавляем новый
         adArray.addAll(newList)
 
     }
+
+
 
     class AdHolder(val binding: AdListItemBinding,val act: MainActivity) : RecyclerView.ViewHolder(binding.root) {
         fun setData(ad: Ad) = with(binding){

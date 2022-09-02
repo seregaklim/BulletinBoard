@@ -19,6 +19,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
@@ -45,11 +46,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var binding: ActivityMainBinding
     private val dialogHelper = DialogHelper(this)
     val mAuth = Firebase.auth
-
     val adapter = AdsRcAdapter(this)
-
     private val firebaseViewModel: FirebaseViewModel by viewModels()
-
+    //очищаем данные при скроле
+    private var clearUpdate: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,9 +60,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         init()
         initRecyclerView()
         initViewModel()
-        firebaseViewModel.loadAllAds()
+   
         bottomMenuOnClick()
+        scrollListener()
     }
+
 
     private fun init (){
         //добавляем свой акшен бар, так как он отключен в манифесте
@@ -111,19 +113,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initViewModel(){
         //следит за обновлением данных
-        firebaseViewModel.liveAdsData.observe(this,{
-            adapter.updateAdapter(it)
-       //если в адаптере пусто , выводим сообщение
-       binding.mainContent.tvEmpty.visibility =if (it.isEmpty()) View.VISIBLE else View.GONE
+        firebaseViewModel.liveAdsData.observe(this) {
+            //значит не очищаем список
+            if (!clearUpdate) {adapter.updateAdapter(it)
+        }else{
+            //тогда очищаем список
+            adapter.updateAdapterWithClear(it)
+        }
 
-        })
+            //если в адаптере пусто , выводим сообщение
+            binding.mainContent.tvEmpty.visibility = if (adapter.itemCount ==0) View.VISIBLE else View.GONE
+
+        }
     }
 
     //нижний тулбар
     private fun bottomMenuOnClick() = with(binding){
         // mainContent.bNavView.menu.setGroupCheckable(0, false, false)
         mainContent.bNavView.setOnItemSelectedListener { item ->
-            // clearUpdate = true
+            //очищвем старый список, загр. новый при скроле
+             clearUpdate = true
             when (item.itemId) {
                 R.id.id_new_ad -> {
 //                    if (mAuth.currentUser != null) {
@@ -145,7 +154,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                      firebaseViewModel.loadMyFavs()
                 }
                 R.id.id_home -> {
-                    firebaseViewModel.loadAllAds()
+
+                    firebaseViewModel.loadAllAds(lastTime = "0")
 
                     //                   currentCategory = getString(R.string.def)
 //                   firebaseViewModel.loadAllAdsFirstPage(filterDb)
@@ -166,7 +176,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     //меню drawerLayout
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-
+       //очищвем старый список, загр. новый
+        clearUpdate=true
         when(item.itemId){
             R.id.id_my_ads -> {
                 Toast.makeText(this, "Pressed id_my_ads", Toast.LENGTH_LONG).show()
@@ -279,10 +290,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         firebaseViewModel.onFavClick(ad)
     }
 
+
+    //загрузка объявления частями
+    private fun scrollListener() = with(binding.mainContent){
+        rcView.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+            override fun onScrollStateChanged(recView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recView, newState)
+                //если не может  скролиться RecyclerView вниз
+                if(!recView.canScrollVertically(SCROLL_DOWN)
+                    //и находится в состоянии покоя
+                    && newState == RecyclerView.SCROLL_STATE_IDLE){
+                 //  Log.d("MyLog", "Не может скролиться!")
+                    //не очищаем старый список, при скроле, тогда к нему прибаляются новые
+                   clearUpdate=false
+                   val adsList =firebaseViewModel.liveAdsData.value!!
+                    //когда доскролим до конца делаем проверку. тк в конце нет объявлений
+                    if (adsList.isNotEmpty()) {
+                        //берем время последнего объявления
+                        adsList[adsList.size-1].let { firebaseViewModel.loadAllAds(it.time) }
+
+                    }
+                }
+            }
+        })
+    }
+
     //константы MainActivity
     companion object{
         const val EDIT_STATE = "edit_state"
         const val ADS_DATA = "ads_data"
+        //если -1 не может скролиться вверх
         const val SCROLL_DOWN = 1
     }
 }

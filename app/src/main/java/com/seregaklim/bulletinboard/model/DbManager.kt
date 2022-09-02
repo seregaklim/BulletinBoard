@@ -30,6 +30,7 @@ class DbManager {
     const val MAIN_NODE = "main"
     //избранные
     const val FAVS_NODE = "favs"
+    //лимит объявлений
     const val ADS_LIMIT = 2
   }
 
@@ -119,9 +120,11 @@ class DbManager {
 
 
   //достаем объявления все подряд
-  fun getAllAds(readDataCallback: ReadDataCallback?){
-    //фильтруем  "/ad/uid" равен моему индмфикатуру аккаунта auth.uid
-    val query = db.orderByChild(auth.uid  + "/ad/price")
+  fun getAllAds(lastTime :String ,readDataCallback: ReadDataCallback?){
+    //фильтруем  по времени "/ad/uid" равен моему индмфикатуру аккаунта auth.uid
+    val query = db.orderByChild(auth.uid  + "/ad/time").startAfter(lastTime)
+      //указываем кол-во объяв.для загрузки по порциям (привязан к времени)
+      .limitToFirst(ADS_LIMIT)
     //выдает все объявления с индификатором
     readDataFromDb(query, readDataCallback)
   }

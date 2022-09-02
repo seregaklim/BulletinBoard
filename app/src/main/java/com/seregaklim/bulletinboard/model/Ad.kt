@@ -21,6 +21,7 @@ data class Ad(
     val key: String? = null,
     // юзер индификатор
     val uid: String? = null,
+    val time: String = "0",
     //избранные(лайк)
     var isFav: Boolean = false,
     var favCounter: String = "0",
