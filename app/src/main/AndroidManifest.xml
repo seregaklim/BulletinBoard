@@ -4,6 +4,7 @@
     package="com.seregaklim.bulletinboard">
 
     <application
+       android:name=".utils.AppMainState"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -12,6 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:replace="android:theme">
+
+        <activity
+            android:name=".act.FilterActivity"
+            android:theme="@style/AppTheme.Filter"
+            android:exported="true" />
         <activity
             android:name=".act.DescriptionActivity"
             android:exported="false" />
@@ -32,3 +38,4 @@
     </application>
 
 </manifest>
+

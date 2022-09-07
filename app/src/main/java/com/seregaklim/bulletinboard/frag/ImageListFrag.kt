@@ -23,7 +23,7 @@ import com.seregaklim.bulletinboard.utils.ItemTouchMoveCallback
 import kotlinx.coroutines.*
 
 
-class ImageListFrag(private val fragCloseInterface : FragmentCloseInterface) : BaseSelectImageFrag(),
+class ImageListFrag(private val fragCloseInterface : FragmentCloseInterface) : BaseAdsFrag(),
 AdapterCallback{
 
     val adapter =SelectImageRvAdapter(this)
@@ -33,8 +33,8 @@ AdapterCallback{
     val touchHelper= ItemTouchHelper(dragCalback)
     //вспогательный класс, закрывающий работу карутин
     private var job: Job? = null
+    lateinit var binding: ListImageFragBinding
 
-    override lateinit var binding: ListImageFragBinding
     private var addImageItem:MenuItem? =null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
